@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Generate Prescription</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/doctor_dashboard.css">
+    <style>
+        :root {
+            --blue: #007bff;
+            --black: #333;
+            --white: #fff;
+            --light-gray: #f8f9fa;
+            --dark-gray: #6c757d;
+        }
+        
+        .prescription-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .appointment-list {
+            margin-bottom: 2rem;
+        }
+
+        .appointment-card {
+            background: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .appointment-card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
+
+        .appointment-card.selected {
+            border-left: 4px solid var(--blue);
+            background: #f8f9fa;
+        }
+
+        .prescription-form {
+            background: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--black);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            font-size: 1.4rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .medicine-entry {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            background: #f9f9f9;
+        }
+
+        .medicine-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: end;
+        }
+
+        .medicine-row input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.3rem;
+            font-size: 1.3rem;
+        }
+
+        .remove-medicine {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .add-medicine {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1.6rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: #218838;
+        }
+
+        .no-appointments {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            font-size: 1.6rem;
+        }
+
+        .patient-info {
+            background: #e9ecef;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: var(--black);
+            font-size: 1.2rem;
+        }
+
+        .info-value {
+            color: #666;
+            font-size: 1.4rem;
+        }
+    </style>
+</head>
+<body>
+     <header>
+        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/doctor/dashboard">Dashboard</a></li>
+                <li><a href="/doctor/appointments">Appointments</a></li>
+                <li><a href="/doctor/prescriptions" class="active">Prescriptions</a></li>
+                <li><a href="/doctor/profile">Profile</a></li>
+                <li><a href="/doctor/form">LogOut</a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+
+    <section class="about">
+        <div class="prescription-container">
+            <h1 class="heading">Generate Prescription</h1>
+            
+            <div class="appointment-list">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--black);">Select Completed Appointment</h3>
+                
+                <% if (appointments.length === 0) { %>
+                    <div class="no-appointments">
+                        <i class="fas fa-calendar-times" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                        <p>No completed appointments available for prescription generation.</p>
+                    </div>
+                <% } else { %>
+                    <% appointments.forEach(appointment => { %>
+                        <div class="appointment-card" onclick="selectAppointment('<%= appointment._id %>', '<%= appointment.patientId.name %>', '<%= appointment.patientId.email %>', '<%= appointment.date %>', '<%= appointment.time %>')">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Patient:</span>
+                                    <span class="info-value"><%= appointment.patientId.name %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Date:</span>
+                                    <span class="info-value"><%= new Date(appointment.date).toLocaleDateString() %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Time:</span>
+                                    <span class="info-value"><%= appointment.time %></span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Contact:</span>
+                                    <span class="info-value"><%= appointment.patientId.email %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+
+            <div id="prescriptionForm" class="prescription-form">
+                <div class="patient-info">
+                    <h4>Patient Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Name:</span>
+                            <span class="info-value" id="selectedPatientName">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value" id="selectedPatientEmail">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Appointment Date:</span>
+                            <span class="info-value" id="selectedAppointmentDate">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Appointment Time:</span>
+                            <span class="info-value" id="selectedAppointmentTime">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="createPrescriptionForm">
+                    <input type="hidden" id="appointmentId" name="appointmentId">
+                    
+                    <div class="form-group">
+                        <label for="age">Age *</label>
+                        <input type="number" id="age" name="age" required min="1" max="120">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight">Weight (kg) *</label>
+                        <input type="number" id="weight" name="weight" required step="0.1" min="1" max="300">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="symptoms">Symptoms & Diagnosis *</label>
+                        <textarea id="symptoms" name="symptoms" placeholder="Describe the patient's symptoms and your diagnosis..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Medicines Prescribed *</label>
+                        <div id="medicinesContainer">
+                            <div class="medicine-entry">
+                                <div class="medicine-row">
+                                    <input type="text" name="medicineName[]" placeholder="Medicine Name" required>
+                                    <input type="text" name="dosage[]" placeholder="Dosage" required>
+                                    <input type="text" name="frequency[]" placeholder="Frequency" required>
+                                    <input type="text" name="duration[]" placeholder="Duration" required>
+                                    <input type="text" name="instructions[]" placeholder="Instructions">
+                                    <button type="button" class="remove-medicine" onclick="removeMedicine(this)" disabled>
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="add-medicine" onclick="addMedicine()">
+                            <i class="fas fa-plus"></i> Add Medicine
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalNotes">Additional Notes & Instructions</label>
+                        <textarea id="additionalNotes" name="additionalNotes" placeholder="Any additional instructions for the patient..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-file-medical"></i> Generate Prescription
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+   <section class="footer">
+        <div class="box">
+            <h2 class="logo"><span>M</span>edi<span>Q</span>uick</h2>
+            <p>Your trusted healthcare partner, providing seamless access to online consultations, appointment bookings,
+                and medicine deliveries, ensuring a hassle-free medical experience.</p>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>S</span>hare</h2>
+            <a href="mailto:mediquick2025@gmail.com">Email</a>
+            <a href="https://www.facebook.com/share/1568c6qDuW/">Facebook</a>
+            <a href="https://www.instagram.com/mediquick2025?igsh=MXVqaDRkY2xvNGJsZg==">Instagram</a>
+            <a
+                href=" https://www.linkedin.com/in/medi-quick-437318355?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">LinkedIn</a>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>L</span>inks</h2>
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/faqs">FAQ's</a>
+            <a href="/contact">Contact Us</a>
+            <a href="/blogs">Blog</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms & Conditions</a>
+        </div>
+        <h1 class="credit">Created by <span>Team MediQuick</span> all rights reserved.</h1>
+    </section>
+
+    <script>
+        let selectedAppointmentCard = null;
+
+        function selectAppointment(appointmentId, patientName, patientEmail, appointmentDate, appointmentTime) {
+            // Remove selection from previous card
+            if (selectedAppointmentCard) {
+                selectedAppointmentCard.classList.remove('selected');
+            }
+
+            // Add selection to current card
+            const cards = document.querySelectorAll('.appointment-card');
+            cards.forEach(card => {
+                if (card.onclick.toString().includes(appointmentId)) {
+                    card.classList.add('selected');
+                    selectedAppointmentCard = card;
+                }
+            });
+
+            // Update form with appointment details
+            document.getElementById('appointmentId').value = appointmentId;
+            document.getElementById('selectedPatientName').textContent = patientName;
+            document.getElementById('selectedPatientEmail').textContent = patientEmail;
+            document.getElementById('selectedAppointmentDate').textContent = new Date(appointmentDate).toLocaleDateString();
+            document.getElementById('selectedAppointmentTime').textContent = appointmentTime;
+
+            // Show prescription form
+            document.getElementById('prescriptionForm').style.display = 'block';
+
+            // Scroll to form
+            document.getElementById('prescriptionForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function addMedicine() {
+            const container = document.getElementById('medicinesContainer');
+            const medicineEntry = document.createElement('div');
+            medicineEntry.className = 'medicine-entry';
+            medicineEntry.innerHTML = `
+                <div class="medicine-row">
+                    <input type="text" name="medicineName[]" placeholder="Medicine Name" required>
+                    <input type="text" name="dosage[]" placeholder="Dosage" required>
+                    <input type="text" name="frequency[]" placeholder="Frequency" required>
+                    <input type="text" name="duration[]" placeholder="Duration" required>
+                    <input type="text" name="instructions[]" placeholder="Instructions">
+                    <button type="button" class="remove-medicine" onclick="removeMedicine(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(medicineEntry);
+
+            // Enable remove button for first medicine if there are multiple
+            if (container.children.length > 1) {
+                container.children[0].querySelector('.remove-medicine').disabled = false;
+            }
+        }
+
+        function removeMedicine(button) {
+            const container = document.getElementById('medicinesContainer');
+            if (container.children.length > 1) {
+                button.closest('.medicine-entry').remove();
+                
+                // Disable remove button for first medicine if only one remains
+                if (container.children.length === 1) {
+                    container.children[0].querySelector('.remove-medicine').disabled = true;
+                }
+            }
+        }
+
+        document.getElementById('createPrescriptionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!document.getElementById('appointmentId').value) {
+                alert('Please select an appointment first');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const medicines = [];
+            
+            // Collect medicine data
+            const medicineNames = formData.getAll('medicineName[]');
+            const dosages = formData.getAll('dosage[]');
+            const frequencies = formData.getAll('frequency[]');
+            const durations = formData.getAll('duration[]');
+            const instructions = formData.getAll('instructions[]');
+
+            for (let i = 0; i < medicineNames.length; i++) {
+                medicines.push({
+                    medicineName: medicineNames[i],
+                    dosage: dosages[i],
+                    frequency: frequencies[i],
+                    duration: durations[i],
+                    instructions: instructions[i] || ''
+                });
+            }
+
+            const prescriptionData = {
+                appointmentId: document.getElementById('appointmentId').value,
+                age: parseInt(formData.get('age')),
+                gender: formData.get('gender'),
+                weight: parseFloat(formData.get('weight')),
+                symptoms: formData.get('symptoms'),
+                medicines: medicines,
+                additionalNotes: formData.get('additionalNotes') || ''
+            };
+
+            try {
+                const response = await fetch('/prescription/doctor/prescriptions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(prescriptionData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Prescription created successfully!');
+                    window.location.href = '/doctor/prescriptions';
+                } else {
+                    alert(result.error || 'Failed to create prescription');
+                }
+            } catch (error) {
+                console.error('Error creating prescription:', error);
+                alert('Failed to create prescription. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

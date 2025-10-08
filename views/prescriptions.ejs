@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Doctor Prescriptions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/doctor_dashboard.css">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <style>
+        .prescriptions-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            min-height: calc(100vh - 200px);
+        }
+        
+        .prescription-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .prescription-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .prescription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .patient-info {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .patient-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .patient-email {
+            color: #3498db;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        
+        .prescription-date {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            text-align: right;
+        }
+        
+        .date-time {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .patient-details {
+            background: linear-gradient(135deg, #ebf5fb, #d6eaf8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .patient-details strong {
+            color: #2c3e50;
+        }
+        
+        .patient-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .patient-detail-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .patient-detail-label {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .patient-detail-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .medicines-section {
+            margin-top: 20px;
+        }
+        
+        .medicines-section h4 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .medicine-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: background-color 0.3s ease;
+        }
+        
+        .medicine-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .medicine-item:last-child {
+            border-bottom: none;
+        }
+        
+        .medicine-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        
+        .medicine-details {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .dosage {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .instructions strong {
+            color: #e67e22;
+        }
+        
+        .diagnosis {
+            background: linear-gradient(135deg, #d6eaf8, #aed6f1);
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .diagnosis strong {
+            color: #2980b9;
+        }
+        
+        .no-prescriptions {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .no-prescriptions i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        
+        .no-prescriptions h3 {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .prescription-id {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        
+        .medicine-detail-item {
+            display: inline-block;
+            margin-right: 15px;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        
+        .medicine-detail-item strong {
+            color: #3498db;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .edit-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #e67e22, #f39c12);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .prescription-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .prescription-date {
+                text-align: left;
+            }
+            
+            .download-btn, .edit-btn {
+                align-self: stretch;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .medicine-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .patient-details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Doctor Header (you'll need to adjust this based on your doctor header structure) -->
+    <header>
+        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/doctor/dashboard">Dashboard</a></li>
+                <li><a href="/doctor/appointments">Appointments</a></li>
+                <li><a href="/doctor/prescriptions" class="active">Prescriptions</a></li>
+                <li><a href="/doctor/profile">Profile</a></li>
+                <li><a href="/doctor/form">LogOut</a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+
+    <section class="prescriptions-container">
+        <h1 class="heading">My Prescriptions</h1>
+        <h3 class="title">Prescriptions created for your patients</h3>
+        
+        <% if (!prescriptions || prescriptions.length === 0) { %>
+            <div class="no-prescriptions">
+                <i class="fas fa-file-medical"></i>
+                <h3>No Prescriptions Found</h3>
+                <p>You haven't created any prescriptions yet. Create your first prescription after a patient consultation.</p>
+                <p style="margin-top: 15px; font-size: 0.9em;">
+                    <a href="/doctor/generate-prescriptions" style="color: #3498db; text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-plus"></i> Create New Prescription
+                    </a>
+                </p>
+            </div>
+        <% } else { %>
+            <div class="prescriptions-list">
+                <% prescriptions.forEach(prescription => { %>
+                    <div class="prescription-card" id="prescription-<%= prescription._id %>">
+                        <div class="prescription-header">
+                            <div class="doctor-info">
+                                <div class="doctor-name">Dr. <%= prescription.doctorId.name %></div>
+                                <div class="specialization"><%= prescription.doctorId.specialization %></div>
+                                <% if (prescription.doctorId.registrationNumber) { %>
+                                    <div style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">
+                                        Reg. No: <%= prescription.doctorId.registrationNumber %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="patient-info">
+                                <div class="patient-name"><%= prescription.patientName %></div>
+                                <div class="patient-email"><%= prescription.patientEmail %></div>
+                                <% if (prescription.patientId && prescription.patientId.mobile) { %>
+                                    <div style="font-size: 0.85em; color: #7f8c8d; margin-top: 5px;">
+                                        Mobile: <%= prescription.patientId.mobile %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="prescription-date">
+                                <div class="date-time">
+                                    <i class="far fa-calendar"></i> 
+                                    <%= new Date(prescription.appointmentDate).toLocaleDateString('en-US', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric' 
+                                    }) %>
+                                </div>
+                                <div style="margin-top: 5px;">
+                                    <i class="far fa-clock"></i> <%= prescription.appointmentTime %>
+                                </div>
+                                <div style="margin-top: 5px; font-size: 0.9em;">
+                                    Created: <%= new Date(prescription.createdAt).toLocaleDateString() %>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Patient Information -->
+                        <div class="patient-details">
+                            <strong><i class="fas fa-user"></i> Patient Details:</strong>
+                            <div class="patient-details-grid">
+                                <div class="patient-detail-item">
+                                    <div class="patient-detail-label">Name</div>
+                                    <div class="patient-detail-value"><%= prescription.patientName %></div>
+                                </div>
+                                <div class="patient-detail-item">
+                                    <div class="patient-detail-label">Age</div>
+                                    <div class="patient-detail-value"><%= prescription.age %> years</div>
+                                </div>
+                                <div class="patient-detail-item">
+                                    <div class="patient-detail-label">Gender</div>
+                                    <div class="patient-detail-value" style="text-transform: capitalize;"><%= prescription.gender %></div>
+                                </div>
+                                <% if (prescription.weight) { %>
+                                    <div class="patient-detail-item">
+                                        <div class="patient-detail-label">Weight</div>
+                                        <div class="patient-detail-value"><%= prescription.weight %> kg</div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <!-- Symptoms/Diagnosis -->
+                        <% if (prescription.symptoms) { %>
+                            <div class="diagnosis">
+                                <strong><i class="fas fa-stethoscope"></i> Symptoms & Diagnosis:</strong><br>
+                                <div style="margin-top: 8px; line-height: 1.6;">
+                                    <%= prescription.symptoms %>
+                                </div>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Prescribed Medicines -->
+                        <div class="medicines-section">
+                            <h4><i class="fas fa-pills"></i> Prescribed Medicines</h4>
+                            <% if (prescription.medicines && prescription.medicines.length > 0) { %>
+                                <% prescription.medicines.forEach((medicine, index) => { %>
+                                    <div class="medicine-item">
+                                        <div style="flex: 1;">
+                                            <div class="medicine-name">
+                                                <%= index + 1 %>. <%= medicine.medicineName %>
+                                            </div>
+                                            <div class="medicine-details">
+                                                <span class="dosage"><%= medicine.dosage %></span>
+                                                <span class="medicine-detail-item">
+                                                    <strong>Frequency:</strong> <%= medicine.frequency %>
+                                                </span>
+                                                <span class="medicine-detail-item">
+                                                    <strong>Duration:</strong> <%= medicine.duration %>
+                                                </span>
+                                                <% if (medicine.instructions) { %>
+                                                    <span class="medicine-detail-item">
+                                                        <strong>Instructions:</strong> <%= medicine.instructions %>
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div style="text-align: center; padding: 20px; color: #7f8c8d;">
+                                    <i class="fas fa-info-circle"></i> No medicines prescribed
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <% if (prescription.additionalNotes) { %>
+                            <div class="instructions">
+                                <strong><i class="fas fa-info-circle"></i> Additional Notes & Instructions:</strong><br>
+                                <div style="margin-top: 8px; line-height: 1.6;">
+                                    <%= prescription.additionalNotes %>
+                                </div>
+                            </div>
+                        <% } %>
+                        
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="/doctor/prescriptions/download/<%= prescription._id %>" class="download-btn" target="_blank">
+                                <i class="fas fa-download"></i> Download PDF
+                            </a>
+                            <a href="/doctor/generate-prescriptions?edit=<%= prescription._id %>" class="edit-btn">
+                                <i class="fas fa-edit"></i> Edit Prescription
+                            </a>
+                        </div>
+                        
+                        <!-- Prescription ID -->
+                        <div class="prescription-id">
+                            <i class="fas fa-fingerprint"></i> Prescription ID: <%= prescription._id %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </section>
+
+    <!-- Footer Section -->
+    <section class="footer">
+        <div class="box">
+            <h2 class="logo"><span>M</span>edi<span>Q</span>uick</h2>
+            <p>Your trusted healthcare partner, providing seamless access to online consultations, appointment bookings,
+                and medicine deliveries, ensuring a hassle-free medical experience.</p>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>S</span>hare</h2>
+            <a href="mailto:mediquick2025@gmail.com">Email</a>
+            <a href="https://www.facebook.com/share/1568c6qDuW/">Facebook</a>
+            <a href="https://www.instagram.com/mediquick2025?igsh=MXVqaDRkY2xvNGJsZg==">Instagram</a>
+            <a
+                href=" https://www.linkedin.com/in/medi-quick-437318355?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">LinkedIn</a>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>L</span>inks</h2>
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/faqs">FAQ's</a>
+            <a href="/contact">Contact Us</a>
+            <a href="/blogs">Blog</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms & Conditions</a>
+        </div>
+        <h1 class="credit">Created by <span>Team MediQuick</span> all rights reserved.</h1>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.fa-bars').click(function () {
+                $(this).toggleClass('fa-times');
+                $('.navbar').toggleClass('nav-toggle');
+            });
+            
+            $(window).on('scroll load', function () {
+                $(this).removeClass('fa-times');
+                $('.navbar').removeClass('nav-toggle');
+                if ($(window).scrollTop() > 30) {
+                    $('header').addClass('header-active');
+                } else {
+                    $('header').removeClass('header-active');
+                }
+            });
+            
+            // Handle download button clicks
+            $('.download-btn').on('click', function(e) {
+                const $btn = $(this);
+                const originalText = $btn.html();
+                const href = $btn.attr('href');
+                
+                // Show loading state
+                $btn.html('<i class="fas fa-spinner fa-spin"></i> Generating PDF...');
+                $btn.prop('disabled', true);
+                
+                // The actual download will happen via the link href
+                // This is just for visual feedback
+                
+                // Reset button after a delay
+                setTimeout(function() {
+                    $btn.html(originalText);
+                    $btn.prop('disabled', false);
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
