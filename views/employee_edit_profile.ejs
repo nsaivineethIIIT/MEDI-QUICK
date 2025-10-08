@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Patient Edit Profile</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Add your CSS styles here */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        :root {
+            --blue: #0188df;
+            --black: #444d53;
+            --white: #fff;
+        }
+
+        * {
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            padding: 0;
+            text-decoration: none;
+            outline: none;
+            box-sizing: border-box;
+            transition: all linear .2s;
+        }
+
+        html {
+            font-size: 62.5%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 96%;
+            background: var(--white);
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translate(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            z-index: 1000;
+        }
+
+        header a {
+            color: var(--black);
+        }
+
+        header a:hover {
+            color: var(--blue);
+        }
+
+        header .logo {
+            font-size: 3rem;
+        }
+
+        header .logo span {
+            color: var(--blue);
+        }
+
+        header .navbar ul {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+        }
+
+        header .navbar ul li {
+            margin: 0 1rem;
+        }
+
+        header .navbar ul li a {
+            font-size: 2rem;
+            color: var(--black);
+        }
+
+        header .navbar ul li a:hover {
+            color: var(--blue);
+        }
+
+        header .fa-bars {
+            font-size: 3rem;
+            color: var(--blue);
+            cursor: pointer;
+            display: none;
+        }
+
+        header .fa-times {
+            transform: rotate(180deg);
+        }
+
+        .header-active {
+            top: 0;
+            width: 100%;
+            box-shadow: .1rem .3rem rgba(0, 0, 0, .3);
+        }
+
+        .footer {
+            background: var(--black);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer .box {
+            width: 30rem;
+            margin: 2rem;
+            text-align: center;
+        }
+
+        .footer .box:nth-child() {
+            text-align: left;
+        }
+
+        .footer .box .logo {
+            padding: 2rem 0;
+            font-size: 3rem;
+            color: var(--white);
+        }
+
+        .footer .box .logo:hover {
+            color: var(--blue);
+        }
+
+        .footer .box .logo span {
+            color: var(--blue);
+        }
+
+        .footer .box p {
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .footer .box a {
+            color: var(--white);
+            font-size: 2rem;
+            display: block;
+            padding: .2rem 0;
+        }
+
+        .footer .box a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .credit {
+            width: 85%;
+            padding-top: 1rem;
+            font-size: 2rem;
+            color: var(--white);
+            text-align: center;
+            border-top: .2rem solid var(--white);
+        }
+
+        .footer .credit span {
+            color: var(--blue);
+            text-decoration: underline;
+            letter-spacing: .5rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            padding: 5px 10px;
+            transition: 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .profile-form input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-left: 10%;
+        }
+
+        .patient-profile {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            margin: 100px 20px 20px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            height: 3.5rem;
+            width: 15rem;
+            background: var(--black);
+            color: var(--white);
+            font-size: 1.7rem;
+            text-transform: capitalize;
+            border-radius: .5rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            border: .1rem solid var(--blue);
+            margin-left: 45%;
+        }
+
+        .button:hover {
+            border: .1rem solid var(--blue);
+            background: var(--white);
+            color: var(--blue);
+            letter-spacing: .2rem;
+        }
+         #errorMsg,#errlogin{
+        color: red;
+        text-align: center;
+        margin: 10px 0;
+        font-size: 1.4rem;
+    }
+    
+    #successMsg,#successlogin{
+        color: green;
+        text-align: center;
+        margin: 10px 0;
+        font-size: 1.4rem;
+    }
+
+    .error-input {
+      border: 1px solid red !important;
+    }
+
+
+
+        @media (max-width:768px) {
+            html {
+                font-size: 55%;
+            }
+
+            header .fa-bars {
+                display: block;
+            }
+
+            header .navbar {
+                position: fixed;
+                top: -100rem;
+                left: 0;
+                width: 100%;
+                background: var(--white);
+                opacity: 0;
+            }
+
+            header .navbar ul {
+                flex-flow: column;
+                padding: 2rem 0;
+            }
+
+            header .navbar ul li {
+                margin: 1rem 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            header .navbar ul li a {
+                font-size: 2rem;
+                display: block;
+            }
+
+            header .nav-toggle {
+                top: 5.5rem;
+                opacity: 1;
+            }
+
+            .patient-profile .button {
+                margin-left: 32.5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/faqs">FAQs</a></li>
+                <li><a href="/blogs">Blog</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+
+    <section class="patient-profile">
+        <div class="close-btn" onclick="window.location.href='/employee/profile'">
+            <i class="fas fa-times"></i>
+        </div>
+        <form class="profile-form" id="editProfileForm" action="/employee/update-profile" method="POST">
+            <div id="errorMsg"></div>
+            <div id="successMsg"></div>
+            <input type="text" name="name" placeholder="Full Name" id="name" value="<%= employee.name %>" required>
+            <input type="email" name="email" placeholder="Email" id="email" value="<%= employee.email %>" required>
+            <input type="text" name="mobile" placeholder="Mobile" id="mobile" value="<%= employee.mobile %>" pattern="\d{10}" required>
+            <input type="text" name="address" placeholder="Address" id="address" value="<%= employee.address %>" required>
+            <button type="submit" class="button">Save Changes</button>
+        </form>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <!-- jquery cd link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- <script>
+        $(document).ready(function () {
+            $('.fa-bars').click(function () {
+                $(this).toggleClass('fa-times');
+                $('.navbar').toggleClass('nav-toggle');
+            });
+            $(window).on('scroll load', function () {
+                $(this).removeClass('fa-times');
+                $('.navbar').removeClass('nav-toggle');
+                if ($(window).scrollTop() > 30) {
+                    $('header').addClass('header-active');
+                } else {
+                    $('header').removeClass('header-active');
+                }
+            });
+
+            // Handle form submission
+            $('#editProfileForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '/employee/update-profile',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        alert(response.message);
+                        window.location.href = response.redirect;
+                    },
+                    error: function (xhr) {
+                        alert(xhr.responseJSON.error);
+                    }
+                });
+            });
+        });
+
+        function closeProfile() {
+            window.location.href = "/employee/profile";
+        }
+    </script> -->
+    <script>
+    $(document).ready(function () {
+        $('.fa-bars').click(function () {
+            $(this).toggleClass('fa-times');
+            $('.navbar').toggleClass('nav-toggle');
+        });
+        $(window).on('scroll load', function () {
+            $(this).removeClass('fa-times');
+            $('.navbar').removeClass('nav-toggle');
+            if ($(window).scrollTop() > 30) {
+                $('header').addClass('header-active');
+            } else {
+                $('header').removeClass('header-active');
+            }
+        });
+        function validateName(){
+        const name = document.getElementById("name").value.trim();
+        if(name.length < 2 || name.length > 500){
+            document.getElementById("name").classList.add('error-input');
+            return false;
+        }
+        document.getElementById("name").classList.remove('error-input');
+        return true;
+    }
+
+    function validateEmail(){
+        const email = document.getElementById("email").value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if(!emailRegex.test(email)){
+            document.getElementById("email").classList.add('error-input');
+            return false;
+        }
+        document.getElementById("email").classList.remove('error-input');
+        return true;
+    }
+    function validateMobile(){
+        const mobile = document.getElementById("mobile").value.trim();
+        const mobileRegex = /^[0-9]{10}$/;
+        if(!mobileRegex.test(mobile)){
+            document.getElementById("mobile").classList.add('error-input');
+            return false;
+        }
+        document.getElementById("mobile").classList.remove('error-input');
+        return true;
+    }
+
+    function validateAddress(){
+        const address = document.getElementById("address").value.trim();
+        if(address.length < 5){
+            document.getElementById("address").classList.add('error-input');
+            return false;
+        }
+        document.getElementById("address").classList.remove('error-input');
+        return true;
+    }
+     document.getElementById('name').addEventListener('blur', validateName);
+    document.getElementById('email').addEventListener('blur', validateEmail);
+    document.getElementById('mobile').addEventListener('blur', validateMobile);
+    document.getElementById('address').addEventListener('blur', validateAddress);
+
+    function validateForm(){
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isMobileValid = validateMobile();
+        const isAddressValid = validateAddress();
+        
+
+        return isNameValid && isEmailValid && isMobileValid && isAddressValid;
+    }
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMsg');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      // Hide success message if shown
+      document.getElementById('successMsg').style.display = 'none';
+    }
+
+
+    
+    // Show success message
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMsg');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      // Hide error message if shown
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+        // Handle form submission with XMLHttpRequest
+        const form = document.getElementById('editProfileForm');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            document.getElementById('errorMsg').textContent = '';
+            document.getElementById('successMsg').textContent = '';
+
+            if (!validateForm()) {
+                showError('Please correct the errors in the form.');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+            
+            xhr.open('POST', '/employee/update-profile', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    alert(response.message);
+                    window.location.href = response.redirect;
+                } else {
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        alert(errorResponse.error || 'An error occurred');
+                    } catch (e) {
+                        alert('An error occurred while processing your request');
+                    }
+                }
+            };
+            
+            xhr.onerror = function () {
+                alert('Network error occurred');
+            };
+            
+            // Convert FormData to URL-encoded string
+            const urlEncodedData = new URLSearchParams(formData).toString();
+            xhr.send(urlEncodedData);
+        });
+    });
+
+    function closeProfile() {
+        window.location.href = "/employee/profile";
+    }
+</script>
+</body>
+</html>
