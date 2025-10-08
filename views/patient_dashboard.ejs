@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Patient Dashboard</title>
+    <!-- font awesome cdn link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- custom css file link -->
+    <link rel="stylesheet" href="/css/patient_dashboard.css">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/faqs">FAQs</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/contact">Contact Us</a></li>
+                <li><a href="/patient/prescriptions">My Prescriptions</a></li>
+                <li><a href="/patient/form">LogOut</a></li>
+                <li><a href="/patient/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
+                            alt="Profile Image" height="30px" width="30px"></a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+    <div class="close-btn" onclick="closeProfile()">
+        <i class="fas fa-times"></i>
+    </div>
+    <section id="about" class="about">
+        <h1 class="heading">About our Facilities</h1>
+        <h3 class="title">Learn and explore our facility</h3>
+        <div class="box-container">
+            <div class="box">
+                <div class="images">
+                    <img src="https://static.vecteezy.com/system/resources/previews/004/578/683/original/a-patient-consults-a-doctor-and-nurse-free-vector.jpg"
+                        alt="Doctor Consulting Image">
+                </div>
+                <div class="content">
+                    <h3>Consult Doctors Online</h3>
+                    <p>Get expert medical consultations from certified doctors from the comfort of your home. Our
+                        platform connects you with specialists across various fields, providing instant access to
+                        professional advice, diagnoses, and treatment plans via video calls and chat.</p>
+                    <a href="/patient/book-doc-online"><button class="button">Learn More</button></a>
+                </div>
+            </div>
+            <div class="box">
+                <div class="images">
+                    <img src="https://www.shutterstock.com/image-photo/booking-meeting-appointment-on-laptop-600nw-1930285112.jpg"
+                        alt="Appointment Booking Image">
+                </div>
+                <div class="content">
+                    <h3>Book Appointments</h3>
+                    <p>Schedule appointments with doctors effortlessly through our user-friendly platform. Choose your
+                        preferred date, time, and specialist, and receive instant confirmation. No long waiting
+                        times—just seamless healthcare access at your convenience.</p>
+                    <a href="/patient/book-appointment"><button class="button">Learn More</button></a>
+                </div>
+            </div>
+            <div class="box">
+                <div class="images">
+                    <img src="https://chandanpharmacy.com/Content/img/medicine-online.jpg"
+                        alt="Online Medicine Ordering Image">
+                </div>
+                <div class="content">
+                    <h3>Order Medicine Online</h3>
+                    <p>Get your prescribed medicines delivered to your doorstep with just a few clicks. Browse through a
+                        wide range of medicines, place an order online, and enjoy fast and secure delivery from licensed
+                        pharmacies.</p>
+                    <!-- <a href="/patient/order-medicines"><button class="button">Learn More</button></a> -->
+                     <a href="/patient/order-medicines"><button class="button">Order Medicine</button></a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="footer">
+        <div class="box">
+            <h2 class="logo"><span>M</span>edi<span>Q</span>uick</h2>
+            <p>Your trusted healthcare partner, providing seamless access to online consultations, appointment bookings,
+                and medicine deliveries, ensuring a hassle-free medical experience.</p>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>S</span>hare</h2>
+            <a href="mailto:mediquick2025@gmail.com">Email</a>
+            <a href="https://www.facebook.com/share/1568c6qDuW/">Facebook</a>
+            <a href="https://www.instagram.com/mediquick2025?igsh=MXVqaDRkY2xvNGJsZg==">Instagram</a>
+            <a
+                href=" https://www.linkedin.com/in/medi-quick-437318355?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">LinkedIn</a>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>L</span>inks</h2>
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/faqs">FAQ's</a>
+            <a href="/contact">Contact Us</a>
+            <a href="/blogs">Blog</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms & Conditions</a>
+        </div>
+        <h1 class="credit">Created by <span>Team MediQuick</span> all rights reserved.</h1>
+    </section>
+    <!-- jquery cd link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- custom js file link -->
+    <script>
+        // navbar function
+        $(document).ready(function () {
+            $('.fa-bars').click(function () {
+                $(this).toggleClass('fa-times');
+                $('.navbar').toggleClass('nav-toggle');
+            });
+            $(Window).on('scroll load', function () {
+                $(this).removeClass('fa-times');
+                $('.navbar').removeClass('nav-toggle');
+                if ($(Window).scrollTop() > 30) {
+                    $('header').addClass('header-active');
+                } else {
+                    $('header').removeClass('header-active');
+                }
+            })
+        });
+
+        function closeProfile() {
+            window.location.href = "/";
+        }
+    </script>
+</body>
+</html>
