@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Employee Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/employee_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="#doc_ssn">Generate Doctor SSN</a></li>
+                <li><a href="#supp_req">Pending Supplier Requests</a></li>
+                <li><a href="#supp_ssn">Generate Supplier SSN</a></li>
+                <li><a href="/employee/doctor_requests">Pending Doctor Requests</a></li>
+                <li><a href="/employee/form">LogOut</a></li>
+                <li><a href="/employee/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
+                    alt="Profile Image" height="30px" width="30px"></a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+
+    <section id="doc_req" class="about">
+        <div class="close-btn" onclick="closeProfile()">
+            <i class="fas fa-times"></i>
+        </div>
+        <h1 class="heading">Pending Doctor Requests</h1><br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Doctor Name</th>
+                    <th>Registration Number</th>
+                    <th>Documents</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Dr. John Doe</td>
+                    <td>REG12345</td>
+                    <td> <input type="file" class="upload-pdf" accept="application/pdf" onchange="uploadDocument(this)">
+                        <a href="#" class="view-pdf" target="_blank" style="display: none;">View PDF</a>
+                    </td>
+                    <td>Pending</td>
+                    <td><button class="approve-btn">Approve</button></td>
+                </tr>
+                <tr>
+                    <td>Dr. Jane Smith</td>
+                    <td>REG67890</td>
+                    <td> <input type="file" class="upload-pdf" accept="application/pdf" onchange="uploadDocument(this)">
+                        <a href="#" class="view-pdf" target="_blank" style="display: none;">View PDF</a>
+                    </td>
+                    <td>Pending</td>
+                    <td><button class="approve-btn">Approve</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="doc_ssn" class="about">
+        <h1 class="heading">Generate Doctor SSN</h1><br>
+        <!-- <iframe src="generate_ssn.html" class="iframe-style"></iframe> -->
+        <form>
+            <label for="doctorName">Doctor Name</label>
+            <input type="text" id="doctorName" name="doctorName" required>
+
+            <label for="doctorRegNo">Doctor Registration Number</label>
+            <input type="text" id="doctorRegNo" name="doctorRegNo" required>
+
+            <label for="SSNnumber">Generated SSN Number</label>
+            <input type="text" id="SSNnumber" name="SSNnumber" readonly>
+
+            <button type="submit" class="generate-btn">Generate SSN</button>
+        </form>
+    </section>
+
+    <section id="supp_req" class="about">
+        <h1 class="heading">Pending Supplier Requests</h1><br>
+        <!-- <iframe src="pending_request_supplier.html" class="iframe-style"></iframe> -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Supplier Name</th>
+                    <th>Supplier ID</th>
+                    <th>Documents</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mr.John Doe</td>
+                    <td>REG12345</td>
+                    <td> <input type="file" class="upload-pdf" accept="application/pdf" onchange="uploadDocument(this)">
+                        <a href="#" class="view-pdf" target="_blank" style="display: none;">View PDF</a>
+                    </td>
+                    <td>Pending</td>
+                    <td><button class="approve-btn">Approve</button></td>
+                </tr>
+                <tr>
+                    <td>Mr. Jane Smith</td>
+                    <td>REG67890</td>
+                    <td> <input type="file" class="upload-pdf" accept="application/pdf" onchange="uploadDocument(this)">
+                        <a href="#" class="view-pdf" target="_blank" style="display: none;">View PDF</a>
+                    </td>
+                    <td>Pending</td>
+                    <td><button class="approve-btn">Approve</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="supp_ssn" class="about">
+        <h1 class="heading">Generate Supplier SSN</h1><br>
+        <!-- <iframe src="generate_ssn_supplier.html" class="iframe-style"></iframe> -->
+        <div class="generate-ssn">
+            <form>
+                <label for="supplierName">Supplier Name</label>
+                <input type="text" id="supplierName" name="supplierName" required>
+    
+                <label for="supplierID">SupplierID</label>
+                <input type="text" id="supplierID" name="supplierID" required>
+    
+                <label for="SSNnumber">Generated SSN Number</label>
+                <input type="text" id="SSNnumber" name="SSNnumber" readonly>
+    
+                <button type="submit" class="generate-btn">Generate SSN</button>
+            </form>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.fa-bars').click(function () {
+                $(this).toggleClass('fa-times');
+                $('.navbar').toggleClass('nav-toggle');
+            });
+            $(window).on('scroll load', function () {
+                $('.fa-bars').removeClass('fa-times');
+                $('.navbar').removeClass('nav-toggle');
+                if ($(window).scrollTop() > 30) {
+                    $('header').addClass('header-active');
+                } else {
+                    $('header').removeClass('header-active');
+                }
+            });
+        });
+
+        function uploadDocument(input) {
+            const file = input.files[0]; // Get the uploaded file
+            if (file && file.type === "application/pdf") {
+                const row = input.closest('tr'); // Get the row containing the input
+                const viewPdfLink = row.querySelector('.view-pdf'); // Get the "View PDF" link
+
+                // Create a URL for the uploaded file
+                const fileURL = URL.createObjectURL(file);
+
+                // Update the "View PDF" link
+                viewPdfLink.href = fileURL;
+                viewPdfLink.style.display = "inline"; // Show the link
+                viewPdfLink.textContent = "View PDF"; // Set link text
+
+                // Optional: Display the file name
+                input.style.display = "none"; // Hide the file input after upload
+            } else {
+                alert("Please upload a valid PDF file.");
+            }
+        }
+
+        function closeProfile() {
+            window.location.href = "/";
+        }
+        
+    </script>
+</body>
+
+</html>

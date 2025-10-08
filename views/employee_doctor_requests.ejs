@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Doctor Requests</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/employee_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <section class="about">
+            <h1 class="heading">Pending Doctor Requests</h1><br>
+
+            <% if (doctors.length===0) { %>
+                <p>No pending doctor requests.</p>
+                <% } else { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Registration No.</th>
+                                <th>Document</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% doctors.forEach(doctor=> { %>
+                                <tr>
+                                    <td>
+                                        <%= doctor.name %>
+                                    </td>
+                                    <td>
+                                        <%= doctor.registrationNumber %>
+                                    </td>
+                                    <td>
+                                        <% if (doctor.documentPath) { %>
+                                            <a href="/<%= doctor.documentPath.replace('\\', '/') %>"
+                                                target="_blank">View Document</a>
+                                            <% } else { %>
+                                                No document
+                                                <% } %>
+                                    </td>
+                                    <td>
+                                        <form action="/employee/approve_doctor/<%= doctor._id %>" method="POST">
+                                            <button type="submit" class="approve-btn">Approve & Generate SSN</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                    <% } %>
+        </section>
+
+        <%- include('partials/footer') %>
+</body>
+
+</html>
