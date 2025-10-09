@@ -92,62 +92,157 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.getProfile =  async (req, res) => {
+// exports.getProfile =  async (req, res) => {
+//     try {
+//         if (!req.session.adminId) {
+//             return res.redirect('/admin_form?error=login_required');
+//         }
+
+//         if (!mongoose.Types.ObjectId.isValid(req.session.adminId)) {
+//             return res.status(400).render('error', {
+//                 message: 'Invalid session data',
+//                 redirect: '/admin_form'
+//             });
+//         }
+
+//         const admin = await Admin.findById(req.session.adminId).lean();
+
+//         if (!admin) {
+//             return res.status(404).render('error', {
+//                 message: 'Admin not found',
+//                 redirect: '/admin_form'
+//             });
+//         }
+
+//         admin.completedConsultations = [
+//             {
+//                 doctorName: "Dr. John",
+//                 consultationDate: "10th May 2025",
+//                 slot: "10AM - 11AM",
+//                 onlineStatus: "Online"
+//             },
+//             {
+//                 doctorName: "Dr. Smith",
+//                 consultationDate: "12th May 2025",
+//                 slot: "2PM - 3PM",
+//                 onlineStatus: "Offline"
+//             }
+//         ];
+
+//         admin.pendingConsultations = [
+//             {
+//                 doctorName: "Dr. Alice",
+//                 consultationDate: "15th May 2025",
+//                 slot: "11AM - 12PM",
+//                 onlineStatus: "Online"
+//             }
+//         ];
+
+//         res.render('admin_profile', {
+//             admin,
+//             title: 'Admin Profile'
+//         });
+//     } catch (err) {
+//         console.error("Error fetching admin profile:", err.message);
+//         res.status(500).render('error', {
+//             message: 'Internal server error',
+//             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+//             redirect: '/'
+//         });
+//     }
+// };
+
+exports.getProfile = async (req, res) => {
     try {
         if (!req.session.adminId) {
-            return res.redirect('/admin_form?error=login_required');
+            return res.redirect('/admin/form?error=login_required');
+        }
+
+        // Just render the template without data - data will be fetched via API
+        res.render('admin_profile', {
+            title: 'Admin Profile'
+        });
+    } catch (err) {
+        console.error("Error rendering admin profile:", err.message);
+        res.status(500).render('error', {
+            message: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+            redirect: '/admin/form'
+        });
+    }
+};
+
+// New API endpoint to fetch admin profile data
+exports.getProfileData = async (req, res) => {
+    try {
+        console.log('Session ID:', req.session.adminId); // Debug log
+        
+        if (!req.session.adminId) {
+            return res.status(401).json({
+                success: false,
+                error: 'Unauthorized',
+                message: 'Please log in first'
+            });
         }
 
         if (!mongoose.Types.ObjectId.isValid(req.session.adminId)) {
-            return res.status(400).render('error', {
-                message: 'Invalid session data',
-                redirect: '/admin_form'
+            return res.status(400).json({ 
+                success: false,
+                error: 'Invalid session data' 
             });
         }
 
         const admin = await Admin.findById(req.session.adminId).lean();
 
         if (!admin) {
-            return res.status(404).render('error', {
-                message: 'Admin not found',
-                redirect: '/admin_form'
+            return res.status(404).json({
+                success: false,
+                error: 'Not Found',
+                message: 'Admin not found'
             });
         }
 
-        admin.completedConsultations = [
-            {
-                doctorName: "Dr. John",
-                consultationDate: "10th May 2025",
-                slot: "10AM - 11AM",
-                onlineStatus: "Online"
+        // Add mock data for consultations (replace with actual data from your database)
+        const profileData = {
+            success: true,
+            admin: {
+                name: admin.name,
+                email: admin.email,
+                mobile: admin.mobile,
+                address: admin.address
             },
-            {
-                doctorName: "Dr. Smith",
-                consultationDate: "12th May 2025",
-                slot: "2PM - 3PM",
-                onlineStatus: "Offline"
-            }
-        ];
+            completedConsultations: [
+                {
+                    doctorName: "Dr. John",
+                    consultationDate: "10th May 2025",
+                    slot: "10AM - 11AM",
+                    onlineStatus: "Online"
+                },
+                {
+                    doctorName: "Dr. Smith",
+                    consultationDate: "12th May 2025",
+                    slot: "2PM - 3PM",
+                    onlineStatus: "Offline"
+                }
+            ],
+            pendingConsultations: [
+                {
+                    doctorName: "Dr. Alice",
+                    consultationDate: "15th May 2025",
+                    slot: "11AM - 12PM",
+                    onlineStatus: "Online"
+                }
+            ]
+        };
 
-        admin.pendingConsultations = [
-            {
-                doctorName: "Dr. Alice",
-                consultationDate: "15th May 2025",
-                slot: "11AM - 12PM",
-                onlineStatus: "Online"
-            }
-        ];
-
-        res.render('admin_profile', {
-            admin,
-            title: 'Admin Profile'
-        });
+        res.status(200).json(profileData);
     } catch (err) {
-        console.error("Error fetching admin profile:", err.message);
-        res.status(500).render('error', {
+        console.error("Error fetching admin profile data:", err.message);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error',
             message: 'Internal server error',
-            details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-            redirect: '/'
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
 };
