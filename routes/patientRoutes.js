@@ -24,4 +24,5 @@ router.get('/api/patient/appointments/previous',patientController.getPreviousApp
 router.get('/api/patient/appointments/upcoming',patientController.getUpcomingAppointments); // Search medicines
 router.get('/prescriptions', patientController.getPrescriptions);
 router.get('/prescriptions/download/:id', patientController.downloadPrescription);
+router.get('/profile-data', patientController.getProfileData);
 module.exports = router;
