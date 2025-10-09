@@ -132,48 +132,12 @@ exports.getProfile = async (req, res) => {
             return res.redirect('/supplier/form?error=login_required');
         }
 
-        if (!mongoose.Types.ObjectId.isValid(req.session.supplierId)) {
-            return res.status(400).render('error', {
-                message: 'Invalid session data',
-                redirect: '/supplier/form'
-            });
-        }
-
-        const supplier = await Supplier.findById(req.session.supplierId).lean();
-
-        if (!supplier) {
-            return res.status(404).render('error', {
-                message: 'Supplier not found',
-                redirect: '/supplier/form'
-            });
-        }
-
-        supplier.previousOrders = [
-            {
-                orderId: "ORD-1001",
-                orderDate: "10th Jan 2025",
-                status: "Delivered"
-            },
-            {
-                orderId: "ORD-1002",
-                orderDate: "15th Feb 2025",
-                status: "Cancelled"
-            }
-        ];
-
-        supplier.pendingOrders = [
-            {
-                orderId: "ORD-1003",
-                orderDate: "5th Mar 2025"
-            }
-        ];
-
+        // Just render the template without data - data will be fetched via API
         res.render('supplier_profile', {
-            supplier,
             title: 'Supplier Profile'
         });
     } catch (err) {
-        console.error("Error fetching supplier profile:", err.message);
+        console.error("Error rendering supplier profile:", err.message);
         res.status(500).render('error', {
             message: 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
@@ -181,6 +145,134 @@ exports.getProfile = async (req, res) => {
         });
     }
 };
+
+// New API endpoint to fetch supplier profile data
+exports.getProfileData = async (req, res) => {
+    try {
+        console.log('Session ID:', req.session.supplierId); // Debug log
+        
+        if (!req.session.supplierId) {
+            return res.status(401).json({
+                success: false,
+                error: 'Unauthorized',
+                message: 'Please log in first'
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(req.session.supplierId)) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'Invalid session data' 
+            });
+        }
+
+        const supplier = await Supplier.findById(req.session.supplierId).lean();
+
+        if (!supplier) {
+            return res.status(404).json({
+                success: false,
+                error: 'Not Found',
+                message: 'Supplier not found'
+            });
+        }
+
+        // Add mock data for orders (replace with actual data from your database)
+        const profileData = {
+            success: true,
+            supplier: {
+                name: supplier.name,
+                email: supplier.email,
+                mobile: supplier.mobile,
+                address: supplier.address,
+                supplierID: supplier.supplierID
+            },
+            previousOrders: [
+                {
+                    orderId: "ORD-1001",
+                    orderDate: "10th Jan 2025",
+                    status: "Delivered"
+                },
+                {
+                    orderId: "ORD-1002",
+                    orderDate: "15th Feb 2025",
+                    status: "Cancelled"
+                }
+            ],
+            pendingOrders: [
+                {
+                    orderId: "ORD-1003",
+                    orderDate: "5th Mar 2025"
+                }
+            ]
+        };
+
+        res.status(200).json(profileData);
+    } catch (err) {
+        console.error("Error fetching supplier profile data:", err.message);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error',
+            message: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+};
+
+// exports.getProfile = async (req, res) => {
+//     try {
+//         if (!req.session.supplierId) {
+//             return res.redirect('/supplier/form?error=login_required');
+//         }
+
+//         if (!mongoose.Types.ObjectId.isValid(req.session.supplierId)) {
+//             return res.status(400).render('error', {
+//                 message: 'Invalid session data',
+//                 redirect: '/supplier/form'
+//             });
+//         }
+
+//         const supplier = await Supplier.findById(req.session.supplierId).lean();
+
+//         if (!supplier) {
+//             return res.status(404).render('error', {
+//                 message: 'Supplier not found',
+//                 redirect: '/supplier/form'
+//             });
+//         }
+
+//         supplier.previousOrders = [
+//             {
+//                 orderId: "ORD-1001",
+//                 orderDate: "10th Jan 2025",
+//                 status: "Delivered"
+//             },
+//             {
+//                 orderId: "ORD-1002",
+//                 orderDate: "15th Feb 2025",
+//                 status: "Cancelled"
+//             }
+//         ];
+
+//         supplier.pendingOrders = [
+//             {
+//                 orderId: "ORD-1003",
+//                 orderDate: "5th Mar 2025"
+//             }
+//         ];
+
+//         res.render('supplier_profile', {
+//             supplier,
+//             title: 'Supplier Profile'
+//         });
+//     } catch (err) {
+//         console.error("Error fetching supplier profile:", err.message);
+//         res.status(500).render('error', {
+//             message: 'Internal server error',
+//             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+//             redirect: '/supplier/form'
+//         });
+//     }
+// };
 
 exports.editProfile = async (req, res) => {
     try {
