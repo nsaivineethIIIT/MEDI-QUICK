@@ -536,11 +536,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
-        // Display patient data
-        document.getElementById('patientName').textContent = '<%= patient.name %>';
-        document.getElementById('patientEmail').textContent = 'Email: <%= patient.email %>';
-        document.getElementById('patientMobile').textContent = 'Mobile: <%= patient.mobile %>';
-        document.getElementById('patientAddress').textContent = 'Address: <%= patient.address %>';
+       
+
 
         // Function to fetch appointments
         async function fetchAppointments(type) {
@@ -601,9 +598,43 @@
                 `;
             }
         }
+        // Load patient data asynchronously
+async function loadPatientData() {
+    try {
+        console.log('Fetching patient profile data...');
+        
+        const response = await fetch('/patient/profile-data', {
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to load profile data');
+        }
+        
+        // Populate patient details
+        document.getElementById('patientName').textContent = data.patient.name;
+        document.getElementById('patientEmail').textContent = 'Email: ' + data.patient.email;
+        document.getElementById('patientMobile').textContent = 'Mobile: ' + data.patient.mobile;
+        document.getElementById('patientAddress').textContent = 'Address: ' + data.patient.address;
+        
+    } catch (error) {
+        console.error('Error loading patient profile data:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = `Error loading profile data: ${error.message}`;
+        document.querySelector('.profile-info').appendChild(errorDiv);
+    }
+}
 
         // Fetch appointments when page loads
         document.addEventListener('DOMContentLoaded', () => {
+            loadPatientData();
             fetchAppointments('previous');
             fetchAppointments('upcoming');
         });
