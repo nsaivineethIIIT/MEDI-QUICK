@@ -151,38 +151,109 @@ exports.login = async (req, res) => {
     }
 };
 
+// exports.getProfile = async (req, res) => {
+//     try {
+//         if (!req.session.patientId) {
+//             return res.redirect('/patient/form?error=login_required');
+//         }
+
+//         if (!mongoose.Types.ObjectId.isValid(req.session.patientId)) {
+//             return res.status(400).render('error', {
+//                 message: 'Invalid session data',
+//                 redirect: '/patient/form'
+//             });
+//         }
+
+//         const patient = await Patient.findById(req.session.patientId).lean();
+
+//         if (!patient) {
+//             return res.status(404).render('error', {
+//                 message: 'Patient not found',
+//                 redirect: '/patient/form'
+//             });
+//         }
+
+//         res.render('patient_profile', {
+//             patient,
+//             title: 'Patient Profile'
+//         });
+//     } catch (err) {
+//         console.error("Error fetching patient profile:", err.message);
+//         res.status(500).render('error', {
+//             message: 'Internal server error',
+//             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+//             redirect: '/patient/form'
+//         });
+//     }
+// };
 exports.getProfile = async (req, res) => {
     try {
         if (!req.session.patientId) {
             return res.redirect('/patient/form?error=login_required');
         }
 
+        // Just render the template without data - data will be fetched via API
+        res.render('patient_profile', {
+            title: 'Patient Profile'
+        });
+    } catch (err) {
+        console.error("Error rendering patient profile:", err.message);
+        res.status(500).render('error', {
+            message: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+            redirect: '/patient/form'
+        });
+    }
+};
+
+// New API endpoint to fetch patient profile data
+exports.getProfileData = async (req, res) => {
+    try {
+        console.log('Session ID:', req.session.patientId); // Debug log
+        
+        if (!req.session.patientId) {
+            return res.status(401).json({
+                success: false,
+                error: 'Unauthorized',
+                message: 'Please log in first'
+            });
+        }
+
         if (!mongoose.Types.ObjectId.isValid(req.session.patientId)) {
-            return res.status(400).render('error', {
-                message: 'Invalid session data',
-                redirect: '/patient/form'
+            return res.status(400).json({ 
+                success: false,
+                error: 'Invalid session data' 
             });
         }
 
         const patient = await Patient.findById(req.session.patientId).lean();
 
         if (!patient) {
-            return res.status(404).render('error', {
-                message: 'Patient not found',
-                redirect: '/patient/form'
+            return res.status(404).json({
+                success: false,
+                error: 'Not Found',
+                message: 'Patient not found'
             });
         }
 
-        res.render('patient_profile', {
-            patient,
-            title: 'Patient Profile'
-        });
+        const profileData = {
+            success: true,
+            patient: {
+                name: patient.name,
+                email: patient.email,
+                mobile: patient.mobile,
+                address: patient.address
+            }
+        };
+
+        res.status(200).json(profileData);
     } catch (err) {
-        console.error("Error fetching patient profile:", err.message);
-        res.status(500).render('error', {
+        console.error("Error fetching patient profile data:", err.message);
+        res.status(500).json({
+            success: false,
+            error: 'Server Error',
             message: 'Internal server error',
-            details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-            redirect: '/patient/form'
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
 };
