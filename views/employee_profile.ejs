@@ -80,6 +80,22 @@
             background-color: #45a049;
         }
 
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
         :root {
@@ -344,6 +360,10 @@
             margin: 1rem 0;
             border: .1rem solid var(--blue);
             margin-left: 45%;
+            display: inline-block;
+            text-align: center;
+            line-height: 3.5rem;
+            text-decoration: none;
         }
 
         .button:hover {
@@ -351,6 +371,33 @@
             background: var(--white);
             color: var(--blue);
             letter-spacing: .2rem;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .action-button.approve {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .action-button.reject {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .action-button:hover {
+            opacity: 0.8;
         }
 
         @media (max-width:768px) {
@@ -409,99 +456,49 @@
         </nav>
         <div class="fas fa-bars"></div>
     </header>
+    
     <div class="container">
         <h1>Employee Profile</h1>
 
-        <div class="profile-info">
-            <div class="profile-details">
-                <h2>Personal Details</h2>
-                <p><strong>Name:</strong>
-                    <%= employee.name %>
-                </p>
-                <p><strong>Email:</strong>
-                    <%= employee.email %>
-                </p>
-                <p><strong>Mobile:</strong>
-                    <%= employee.mobile %>
-                </p>
-                <p><strong>Address:</strong>
-                    <%= employee.address %>
-                </p>
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading profile data...
+        </div>
+
+        <div id="profile-content" style="display: none;">
+            <div class="profile-info">
+                <div class="profile-details">
+                    <h2>Personal Details</h2>
+                    <p><strong>Name:</strong> <span id="employee-name">-</span></p>
+                    <p><strong>Email:</strong> <span id="employee-email">-</span></p>
+                    <p><strong>Mobile:</strong> <span id="employee-mobile">-</span></p>
+                    <p><strong>Address:</strong> <span id="employee-address">-</span></p>
+                </div>
+                <div class="profile-photo-container">
+                    <img src="/images/profile-photo.jpg" alt="Profile Photo">
+                </div>
             </div>
-            <div class="profile-photo-container">
-                <img src="/images/profile-photo.jpg" alt="Profile Photo">
+
+            <div class="registrations">
+                <h2>Previous Doctor Registrations</h2>
+                <div id="previous-registrations">
+                    <!-- Previous registrations will be populated here -->
+                </div>
+            </div>
+
+            <div class="registrations">
+                <h2>Pending Doctor Registrations</h2>
+                <div id="pending-registrations">
+                    <!-- Pending registrations will be populated here -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/employee/edit-profile" class="button">Edit Profile</a>
+                <a href="/change_password" class="button">Change Password</a>
             </div>
         </div>
 
-        <div class="registrations">
-            <h2>Previous Doctor Registrations</h2>
-            <% if (employee.previousRegistrations && employee.previousRegistrations.length> 0) { %>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Doctor Name</th>
-                            <th>Registration Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% employee.previousRegistrations.forEach(registration=> { %>
-                            <tr>
-                                <td>
-                                    <%= registration.doctorName %>
-                                </td>
-                                <td>
-                                    <%= registration.registrationDate %>
-                                </td>
-                                <td>
-                                    <%= registration.status %>
-                                </td>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-                <% } else { %>
-                    <p>No previous registrations found.</p>
-                    <% } %>
-        </div>
-
-        <div class="registrations">
-            <h2>Pending Doctor Registrations</h2>
-            <% if (employee.pendingRegistrations && employee.pendingRegistrations.length> 0) { %>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Doctor Name</th>
-                            <th>Registration Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% employee.pendingRegistrations.forEach(registration=> { %>
-                            <tr>
-                                <td>
-                                    <%= registration.doctorName %>
-                                </td>
-                                <td>
-                                    <%= registration.registrationDate %>
-                                </td>
-                                <td>
-                                    <button class="action-button approve">Approve</button>
-                                    <button class="action-button reject">Reject</button>
-                                </td>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-                <% } else { %>
-                    <p>No pending registrations found.</p>
-                    <% } %>
-        </div>
-
-        <div class="action-buttons">
-            <a href="/employee/edit-profile" class="button">Edit Profile</a>
-            <a href="/change_password" class="button">Change Password</a>
-        </div>
+        <div id="error-message" class="error-message" style="display: none;"></div>
     </div>
 
     <section class="footer">
@@ -536,26 +533,137 @@
 
     <script>
         $(document).ready(function () {
+            // Load profile data
+            loadProfileData();
+
             $('.fa-bars').click(function () {
                 $(this).toggleClass('fa-times');
                 $('.navbar').toggleClass('nav-toggle');
             });
-            $(Window).on('scroll load', function () {
+            
+            $(window).on('scroll load', function () {
                 $(this).removeClass('fa-times');
                 $('.navbar').removeClass('nav-toggle');
-                if ($(Window).scrollTop() > 30) {
+                if ($(window).scrollTop() > 30) {
                     $('header').addClass('header-active');
                 } else {
                     $('header').removeClass('header-active');
                 }
-            })
+            });
         });
 
+        async function loadProfileData() {
+            try {
+                const response = await fetch('/employee/profile-data');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Hide loading and show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profile-content').style.display = 'block';
+                
+                // Populate employee details
+                document.getElementById('employee-name').textContent = data.employee.name;
+                document.getElementById('employee-email').textContent = data.employee.email;
+                document.getElementById('employee-mobile').textContent = data.employee.mobile;
+                document.getElementById('employee-address').textContent = data.employee.address;
+                
+                // Populate previous registrations
+                populateRegistrations('previous', data.previousRegistrations);
+                
+                // Populate pending registrations
+                populateRegistrations('pending', data.pendingRegistrations);
+                
+            } catch (error) {
+                console.error('Error loading profile data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-message').textContent = 
+                    'Failed to load profile data. Please try again later.';
+            }
+        }
+
+        function populateRegistrations(type, registrations) {
+            const container = document.getElementById(`${type}-registrations`);
+            
+            if (!registrations || registrations.length === 0) {
+                container.innerHTML = '<p>No registrations found.</p>';
+                return;
+            }
+            
+            if (type === 'previous') {
+                const tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor Name</th>
+                                <th>Registration Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${registrations.map(reg => `
+                                <tr>
+                                    <td>${reg.doctorName}</td>
+                                    <td>${reg.registrationDate}</td>
+                                    <td>${reg.status}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                container.innerHTML = tableHTML;
+            } else if (type === 'pending') {
+                const tableHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor Name</th>
+                                <th>Registration Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${registrations.map(reg => `
+                                <tr>
+                                    <td>${reg.doctorName}</td>
+                                    <td>${reg.registrationDate}</td>
+                                    <td>
+                                        <button class="action-button approve" onclick="handleApprove('${reg.doctorName}')">Approve</button>
+                                        <button class="action-button reject" onclick="handleReject('${reg.doctorName}')">Reject</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                container.innerHTML = tableHTML;
+            }
+        }
+
+        function handleApprove(doctorName) {
+            if (confirm(`Are you sure you want to approve ${doctorName}?`)) {
+                // Add your approval logic here
+                alert(`Approved ${doctorName}`);
+                // You can make another fetch call here to update the status
+            }
+        }
+
+        function handleReject(doctorName) {
+            if (confirm(`Are you sure you want to reject ${doctorName}?`)) {
+                // Add your rejection logic here
+                alert(`Rejected ${doctorName}`);
+                // You can make another fetch call here to update the status
+            }
+        }
+
         function closeProfile() {
-            window.location.href = "admin_profile.html";
+            window.location.href = "/employee/dashboard";
         }
     </script>
-
 </body>
-
 </html>
