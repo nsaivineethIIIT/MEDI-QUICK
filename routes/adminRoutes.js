@@ -15,5 +15,9 @@ router.get('/profile', adminController.getProfile); // Get doctor profile
 router.get('/edit-profile', adminController.getEditProfile); // Get edit profile form
 router.post('/update-profile', adminController.updateProfile);
 router.get('/profile-data', adminController.getProfileData);
+//finance routes
+router.get('/api/finance', adminController.getFinanceData); // Get financial transactions
+router.get('/api/earnings', adminController.getEarnings); // Get earnings data (daily, monthly, yearly)
+router.get('/api/revenue-summary', adminController.getRevenueSummary); 
 
 module.exports = router;
