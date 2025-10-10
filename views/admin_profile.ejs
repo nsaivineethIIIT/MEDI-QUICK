@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediQuick | Admin Profile</title>
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
@@ -107,15 +107,13 @@
 
         .container {
             width: 80%;
-            margin: 20px auto;
-            margin-top: 100px;
+            margin: 100px auto 20px auto;
             background: #fff;
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1,
-        h2 {
+        h1, h2 {
             color: #333;
         }
 
@@ -130,7 +128,8 @@
         }
 
         .profile-details p {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-size: 16px;
         }
 
         .profile-photo-container {
@@ -150,32 +149,82 @@
             margin-bottom: 20px;
         }
 
-        table,
-        th,
-        td {
+        table, th, td {
             border: 1px solid #ddd;
         }
 
-        th,
-        td {
-            padding: 10px;
+        th, td {
+            padding: 12px;
             text-align: left;
         }
 
         th {
             background-color: #f4f4f4;
+            font-weight: bold;
         }
 
-        .edit-profile-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid #f44336;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            padding: 5px 10px;
+            transition: 0.3s;
         }
 
-        .edit-profile-btn:hover {
-            background-color: #45a049;
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .button {
+            display: inline-block;
+            height: 3.5rem;
+            width: 15rem;
+            background: var(--black);
+            color: var(--white);
+            font-size: 1.7rem;
+            text-transform: capitalize;
+            border-radius: .5rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            border: .1rem solid var(--blue);
+            text-align: center;
+            line-height: 3.5rem;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            border: .1rem solid var(--blue);
+            background: var(--white);
+            color: var(--blue);
+            letter-spacing: .2rem;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
         }
 
         .footer {
@@ -242,45 +291,6 @@
             letter-spacing: .5rem;
         }
 
-        .close-btn {
-            position: absolute;
-            top: 15%;
-            left: 5%;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            padding: 5px 10px;
-            transition: 0.3s;
-        }
-
-        .close-btn:hover {
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-        }
-
-        .button {
-            height: 3.5rem;
-            width: 15rem;
-            background: var(--black);
-            color: var(--white);
-            font-size: 1.7rem;
-            text-transform: capitalize;
-            border-radius: .5rem;
-            cursor: pointer;
-            margin: 1rem 0;
-            border: .1rem solid var(--blue);
-            margin-left: 45%;
-        }
-
-        .button:hover {
-            border: .1rem solid var(--blue);
-            background: var(--white);
-            color: var(--blue);
-            letter-spacing: .2rem;
-        }
-
         @media (max-width:768px) {
             html {
                 font-size: 55%;
@@ -322,6 +332,7 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
@@ -332,6 +343,7 @@
                 <li><a href="/faqs">FAQs</a></li>
                 <li><a href="/blogs">Blog</a></li>
                 <li><a href="/contact">Contact Us</a></li>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
             </ul>
         </nav>
         <div class="fas fa-bars"></div>
@@ -341,91 +353,88 @@
         <div class="close-btn" onclick="closeProfile()">
             <i class="fas fa-times"></i>
         </div>
+        
         <h1 style="color:var(--blue); font-size: 2.5rem;text-align: center;">Admin Profile</h1>
-        <div class="profile-info">
-            <div class="profile-details">
-                <h2 style="color:var(--blue);font-size: 1.5rem;">Personal Details</h2>
-                <p><strong>Name:</strong> <%= admin.name %></p>
-                <p><strong>Email:</strong> <%= admin.email %></p>
-                <p><strong>Mobile:</strong> <%= admin.mobile %></p>
-                <p><strong>Address:</strong> <%= admin.address %></p>
-                <p><strong>Company Security Number:</strong> CS123456789</p>
+
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin fa-2x"></i><br>
+            <p>Loading profile data...</p>
+        </div>
+
+        <div id="profile-content" style="display: none;">
+            <div class="profile-info">
+                <div class="profile-details">
+                    <h2 style="color:var(--blue);font-size: 1.5rem;">Personal Details</h2>
+                    <p><strong>Name:</strong> <span id="admin-name">-</span></p>
+                    <p><strong>Email:</strong> <span id="admin-email">-</span></p>
+                    <p><strong>Mobile:</strong> <span id="admin-mobile">-</span></p>
+                    <p><strong>Address:</strong> <span id="admin-address">-</span></p>
+                    <p><strong>Company Security Number:</strong> CS123456789</p>
+                </div>
+                <div class="profile-photo-container">
+                    <img src="/images/profile-photo.jpg" alt="Profile Photo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiBmaWxsPSIjRjRGNEWGIi8+CjxwYXRoIGQ9Ik02MCA3MEM2Ni42MjgxIDcwIDcyIDY0LjYyODEgNzIgNThDNzIgNTEuMzcxOSA2Ni42MjgxIDQ2IDYwIDQ2QzUzLjM3MTkgNDYgNDggNTEuMzcxOSA0OCA1OEM0OCA2NC42MjgxIDUzLjM3MTkgNzAgNjAgNzBaIiBmaWxsPSIjOEU5MEE2Ii8+CjxwYXRoIGQ9Ik00OC44NTcxIDEwMEM3MS4xNDI5IDEwMCA4OCA4My4xNDI5IDg4IDYwLjg1NzFDODggMzguNTcxNCA3MS4xNDI5IDIyIDQ4Ljg1NzEgMjJDMjYuNTcxNCAyMiAxMCAzOC41NzE0IDEwIDYwLjg1NzFDMTAgODMuMTQyOSAyNi41NzE0IDEwMCA0OC44NTcxIDEwMFoiIGZpbGw9IiM4RTkwQTYiLz4KPC9zdmc+'">
+                </div>
             </div>
-            <div class="profile-photo-container">
-                <img src="profile-photo.jpg" alt="Profile Photo">
+
+            <div class="registrations">
+                <h2 style="color:var(--blue);font-size: 1.5rem;">Completed Consultations</h2><br>
+                <div id="completed-consultations">
+                    <!-- Completed consultations will be populated here -->
+                </div>
+            </div>
+
+            <div class="registrations">
+                <h2 style="color:var(--blue); font-size: 1.5rem;">Pending Consultations</h2><br>
+                <div id="pending-consultations">
+                    <!-- Pending consultations will be populated here -->
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/admin/edit-profile" class="button">Edit Profile</a>
+                <a href="/admin/dashboard" class="button">Back to Dashboard</a>
             </div>
         </div>
 
-        <div class="registrations">
-            <h2 style="color:var(--blue);font-size: 1.5rem;">Completed Consultations</h2><br>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Doctor Name</th>
-                        <th>Consultation Date</th>
-                        <th>Slot</th>
-                        <th>Online/Offline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (admin.completedConsultations) { %>
-                        <% admin.completedConsultations.forEach(consultation => { %>
-                            <tr>
-                                <td><%= consultation.doctorName %></td>
-                                <td><%= consultation.consultationDate %></td>
-                                <td><%= consultation.slot %></td>
-                                <td><%= consultation.onlineStatus %></td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr><td colspan="4">No completed consultations</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="registrations">
-            <h2 style="color:var(--blue); font-size: 1.5rem;">Pending Consultations</h2><br>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Doctor Name</th>
-                        <th>Consultation Date</th>
-                        <th>Slot</th>
-                        <th>Online/Offline</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (admin.pendingConsultations) { %>
-                        <% admin.pendingConsultations.forEach(consultation => { %>
-                            <tr>
-                                <td><%= consultation.doctorName %></td>
-                                <td><%= consultation.consultationDate %></td>
-                                <td><%= consultation.slot %></td>
-                                <td><%= consultation.onlineStatus %></td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr><td colspan="4">No pending consultations</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-
-        <a href="/admin/edit-profile"><button class="button">Edit Profile</button></a>
+        <div id="error-message" class="error-message" style="display: none;"></div>
     </div>
 
-    <%- include('partials/footer') %>
+    <section class="footer">
+        <div class="box">
+            <h2 class="logo"><span>M</span>edi<span>Q</span>uick</h2>
+            <p>Your trusted healthcare partner, providing seamless access to online consultations, appointment bookings, and medicine deliveries.</p>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>S</span>hare</h2>
+            <a href="mailto:mediquick2025@gmail.com">Email</a>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+        </div>
+        <div class="box">
+            <h2 class="logo"><span>L</span>inks</h2>
+            <a href="/">Home</a>
+            <a href="/about">About Us</a>
+            <a href="/faqs">FAQ's</a>
+            <a href="/contact">Contact Us</a>
+            <a href="/blogs">Blog</a>
+        </div>
+        <h1 class="credit">Created by <span>Team MediQuick</span> all rights reserved.</h1>
+    </section>
 
     <!-- jquery cdn link -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
         $(document).ready(function () {
+            // Load profile data
+            loadProfileData();
+
             $('.fa-bars').click(function () {
                 $(this).toggleClass('fa-times');
                 $('.navbar').toggleClass('nav-toggle');
             });
+            
             $(window).on('scroll load', function () {
                 $('.fa-bars').removeClass('fa-times');
                 $('.navbar').removeClass('nav-toggle');
@@ -437,12 +446,94 @@
             });
         });
 
+        async function loadProfileData() {
+            try {
+                console.log('Fetching admin profile data...');
+                
+                const response = await fetch('/admin/profile-data', {
+                    credentials: 'same-origin' // Important for session cookies
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                }
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Failed to load profile data');
+                }
+                
+                // Hide loading and show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profile-content').style.display = 'block';
+                
+                // Populate admin details
+                document.getElementById('admin-name').textContent = data.admin.name;
+                document.getElementById('admin-email').textContent = data.admin.email;
+                document.getElementById('admin-mobile').textContent = data.admin.mobile;
+                document.getElementById('admin-address').textContent = data.admin.address;
+                
+                // Populate completed consultations
+                populateConsultations('completed', data.completedConsultations);
+                
+                // Populate pending consultations
+                populateConsultations('pending', data.pendingConsultations);
+                
+            } catch (error) {
+                console.error('Error loading admin profile data:', error);
+                document.getElementById('loading').style.display = 'none';
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `Error: ${error.message}. Please try again later.`;
+                
+                // Show retry button
+                const retryButton = document.createElement('button');
+                retryButton.textContent = 'Retry';
+                retryButton.className = 'button';
+                retryButton.style.margin = '10px auto';
+                retryButton.onclick = loadProfileData;
+                errorDiv.appendChild(document.createElement('br'));
+                errorDiv.appendChild(retryButton);
+            }
+        }
+
+        function populateConsultations(type, consultations) {
+            const container = document.getElementById(`${type}-consultations`);
+            
+            if (!consultations || consultations.length === 0) {
+                container.innerHTML = '<p>No ' + type + ' consultations found.</p>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor Name</th>
+                            <th>Consultation Date</th>
+                            <th>Slot</th>
+                            <th>Online/Offline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${consultations.map(consultation => `
+                            <tr>
+                                <td>${consultation.doctorName}</td>
+                                <td>${consultation.consultationDate}</td>
+                                <td>${consultation.slot}</td>
+                                <td>${consultation.onlineStatus}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            container.innerHTML = tableHTML;
+        }
+
         function closeProfile() {
             window.location.href = "/admin/dashboard";
         }
     </script>
-
 </body>
-
-
 </html>
