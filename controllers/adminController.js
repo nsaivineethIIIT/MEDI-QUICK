@@ -683,3 +683,282 @@ exports.getSignins = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// new api endpoints for finance
+exports.getFinanceData = async (req, res) => {
+    try {
+        if (!req.session.adminId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Fetch all non-cancelled appointments for finance data
+        const appointments = await Appointment.find({
+            isBlockedSlot: { $ne: true },
+            status: { $ne: 'cancelled' }
+        })
+        .populate('patientId', 'name')
+        .populate('doctorId', 'name specialization')
+        .sort({ date: -1 })
+        .lean();
+
+        const financeData = appointments.map(appt => ({
+            _id: appt._id,
+            patientName: appt.patientId?.name || 'Unknown Patient',
+            doctorName: appt.doctorId?.name || 'Unknown Doctor',
+            specialization: appt.doctorId?.specialization || 'General Physician',
+            date: appt.date.toISOString().split('T')[0],
+            time: appt.time,
+            fee: appt.consultationFee || 0,
+            revenue: (appt.consultationFee || 0) * 0.1, // 10% revenue
+            status: appt.status
+        }));
+
+        res.json(financeData);
+    } catch (err) {
+        console.error("Error fetching finance data:", err.message);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+};
+
+exports.getEarnings = async (req, res) => {
+    try {
+        if (!req.session.adminId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        // Only filter by start date (Jan 1, 2025), no end date to include future appointments
+        const startDate = new Date('2025-01-01');
+
+        // Fetch appointments from start date onwards (including all future dates)
+        const appointments = await Appointment.find({
+            isBlockedSlot: { $ne: true },
+            status: { $ne: 'cancelled' },
+            date: { $gte: startDate } // No end date filter - includes all future appointments
+        })
+        .populate('doctorId', 'specialization')
+        .lean();
+
+        // Aggregate daily earnings
+        const dailyEarnings = {};
+        appointments.forEach(appt => {
+            const dateStr = appt.date.toISOString().split('T')[0]; // YYYY-MM-DD
+            if (!dailyEarnings[dateStr]) {
+                dailyEarnings[dateStr] = {
+                    date: dateStr,
+                    count: 0,
+                    totalFees: 0,
+                    totalRevenue: 0
+                };
+            }
+            dailyEarnings[dateStr].count++;
+            dailyEarnings[dateStr].totalFees += appt.consultationFee || 0;
+            dailyEarnings[dateStr].totalRevenue += (appt.consultationFee || 0) * 0.1;
+        });
+
+        // Aggregate monthly earnings
+        const monthlyEarnings = {};
+        appointments.forEach(appt => {
+            const date = new Date(appt.date);
+            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            if (!monthlyEarnings[monthKey]) {
+                monthlyEarnings[monthKey] = {
+                    month: monthKey,
+                    count: 0,
+                    totalFees: 0,
+                    totalRevenue: 0
+                };
+            }
+            monthlyEarnings[monthKey].count++;
+            monthlyEarnings[monthKey].totalFees += appt.consultationFee || 0;
+            monthlyEarnings[monthKey].totalRevenue += (appt.consultationFee || 0) * 0.1;
+        });
+
+        // Aggregate yearly earnings
+        const yearlyEarnings = {};
+        appointments.forEach(appt => {
+            const year = new Date(appt.date).getFullYear();
+            if (!yearlyEarnings[year]) {
+                yearlyEarnings[year] = {
+                    year: year.toString(),
+                    count: 0,
+                    totalFees: 0,
+                    totalRevenue: 0
+                };
+            }
+            yearlyEarnings[year].count++;
+            yearlyEarnings[year].totalFees += appt.consultationFee || 0;
+            yearlyEarnings[year].totalRevenue += (appt.consultationFee || 0) * 0.1;
+        });
+
+        // Convert to arrays and sort
+        const dailyEarningsArray = Object.values(dailyEarnings)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        const monthlyEarningsArray = Object.values(monthlyEarnings)
+            .sort((a, b) => b.month.localeCompare(a.month));
+        const yearlyEarningsArray = Object.values(yearlyEarnings)
+            .sort((a, b) => b.year - a.year);
+
+        res.json({
+            daily: dailyEarningsArray,
+            monthly: monthlyEarningsArray,
+            yearly: yearlyEarningsArray
+        });
+    } catch (err) {
+        console.error("Error fetching earnings:", err.message);
+        res.status(500).json({
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+};
+
+// exports.getEarnings = async (req, res) => {
+//     try {
+//         if (!req.session.adminId) {
+//             return res.status(401).json({ error: 'Unauthorized' });
+//         }
+
+//         // Define the start date (Jan 1, 2025)
+//         const startDate = new Date('2025-01-01');
+//         const endDate = new Date(); // Current date
+
+//         // Fetch appointments within the date range
+//         const appointments = await Appointment.find({
+//             isBlockedSlot: { $ne: true },
+//             status: { $ne: 'cancelled' },
+//             date: { $gte: startDate, $lte: endDate }
+//         })
+//         .populate('doctorId', 'specialization')
+//         .lean();
+
+//         // Aggregate daily earnings
+//         const dailyEarnings = {};
+//         appointments.forEach(appt => {
+//             const dateStr = appt.date.toISOString().split('T')[0]; // YYYY-MM-DD
+//             if (!dailyEarnings[dateStr]) {
+//                 dailyEarnings[dateStr] = {
+//                     date: dateStr,
+//                     count: 0,
+//                     totalFees: 0,
+//                     totalRevenue: 0
+//                 };
+//             }
+//             dailyEarnings[dateStr].count++;
+//             dailyEarnings[dateStr].totalFees += appt.consultationFee || 0;
+//             dailyEarnings[dateStr].totalRevenue += (appt.consultationFee || 0) * 0.1;
+//         });
+
+//         // Aggregate monthly earnings
+//         const monthlyEarnings = {};
+//         appointments.forEach(appt => {
+//             const date = new Date(appt.date);
+//             const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+//             if (!monthlyEarnings[monthKey]) {
+//                 monthlyEarnings[monthKey] = {
+//                     month: monthKey,
+//                     count: 0,
+//                     totalFees: 0,
+//                     totalRevenue: 0
+//                 };
+//             }
+//             monthlyEarnings[monthKey].count++;
+//             monthlyEarnings[monthKey].totalFees += appt.consultationFee || 0;
+//             monthlyEarnings[monthKey].totalRevenue += (appt.consultationFee || 0) * 0.1;
+//         });
+
+//         // Aggregate yearly earnings
+//         const yearlyEarnings = {};
+//         appointments.forEach(appt => {
+//             const year = new Date(appt.date).getFullYear();
+//             if (!yearlyEarnings[year]) {
+//                 yearlyEarnings[year] = {
+//                     year: year.toString(),
+//                     count: 0,
+//                     totalFees: 0,
+//                     totalRevenue: 0
+//                 };
+//             }
+//             yearlyEarnings[year].count++;
+//             yearlyEarnings[year].totalFees += appt.consultationFee || 0;
+//             yearlyEarnings[year].totalRevenue += (appt.consultationFee || 0) * 0.1;
+//         });
+
+//         // Convert to arrays and sort
+//         const dailyEarningsArray = Object.values(dailyEarnings)
+//             .sort((a, b) => new Date(b.date) - new Date(a.date));
+//         const monthlyEarningsArray = Object.values(monthlyEarnings)
+//             .sort((a, b) => b.month.localeCompare(a.month));
+//         const yearlyEarningsArray = Object.values(yearlyEarnings)
+//             .sort((a, b) => b.year - a.year);
+
+//         res.json({
+//             daily: dailyEarningsArray,
+//             monthly: monthlyEarningsArray,
+//             yearly: yearlyEarningsArray
+//         });
+//     } catch (err) {
+//         console.error("Error fetching earnings:", err.message);
+//         res.status(500).json({
+//             error: 'Internal server error',
+//             details: process.env.NODE_ENV === 'development' ? err.message : undefined
+//         });
+//     }
+// };
+
+exports.getRevenueSummary = async (req, res) => {
+    try {
+        if (!req.session.adminId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const appointments = await Appointment.find({
+            isBlockedSlot: { $ne: true },
+            status: { $ne: 'cancelled' }
+        })
+        .populate('doctorId', 'specialization')
+        .lean();
+
+        // Calculate totals
+        const totalAppointments = appointments.length;
+        const totalFees = appointments.reduce((sum, appt) => sum + (appt.consultationFee || 0), 0);
+        const totalRevenue = totalFees * 0.1;
+
+        // Calculate by specialization
+        const specializationData = {};
+        appointments.forEach(appt => {
+            const spec = appt.doctorId?.specialization || 'General Physician';
+            if (!specializationData[spec]) {
+                specializationData[spec] = {
+                    specialization: spec,
+                    count: 0,
+                    totalFees: 0,
+                    totalRevenue: 0
+                };
+            }
+            specializationData[spec].count++;
+            specializationData[spec].totalFees += appt.consultationFee || 0;
+            specializationData[spec].totalRevenue += (appt.consultationFee || 0) * 0.1;
+        });
+
+        const specializationArray = Object.values(specializationData)
+            .sort((a, b) => b.totalFees - a.totalFees);
+
+        res.json({
+            summary: {
+                totalAppointments,
+                totalFees,
+                totalRevenue
+            },
+            bySpecialization: specializationArray
+        });
+    } catch (err) {
+        console.error("Error fetching revenue summary:", err.message);
+        res.status(500).json({
+            error: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+};
