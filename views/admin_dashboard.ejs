@@ -232,16 +232,132 @@
     </section>
 
     <section id="previous" class="about">
-      
+        <h1 class="heading">Appointments</h1><br>
+        <div class="table-container">
+            <table id="appointmentsTable">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Fee</th>
+                        <th>Revenue (10%)</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsBody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 
     <section id="finance" class="about">
-        
- 
+        <h1 class="heading">Finance</h1><br>
+        <div class="table-container">
+            <table id="financeTable">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Specialization</th> 
+                        <th>Date</th>
+                        <th>Fee</th>
+                        <th>Revenue (10%)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="financeBody">
+                    <tr>
+                        <td colspan="7" class="loading">Loading data...</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">Total Revenue</td>
+                        <td id="totalFees">$0.00</td>
+                        <td id="totalRevenue">$0.00</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+           
+        </div>
     </section>
     <section id="earnings" class="about">
-       
-      
+        <h1 class="heading">Earnings Reports</h1><br>
+        <div class="table-container">
+            <h2>Daily Earnings Summary (Since Jan 2025)</h2>
+            <table id="dailyEarningsTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Total Appointments</th>
+                        <th>Total Fees</th>
+                        <th>MediQuick Revenue (10%)</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyEarningsBody">
+                    <tr>
+                        <td colspan="4" class="loading">Loading daily earnings data...</td>
+                    </tr>
+                </tbody>
+            </table>
+    
+            <h2>Monthly Earnings Summary (Since Jan 2025)</h2>
+            <table id="monthlyEarningsTable">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Total Appointments</th>
+                        <th>Total Fees</th>
+                        <th>MediQuick Revenue (10%)</th>
+                    </tr>
+                </thead>
+                <tbody id="monthlyEarningsBody">
+                    <tr>
+                        <td colspan="4" class="loading">Loading monthly earnings data...</td>
+                    </tr>
+                </tbody>
+            </table>
+    
+            <h2>Yearly Earnings Summary (Since Jan 2025)</h2>
+            <table id="yearlyEarningsTable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Total Appointments</th>
+                        <th>Total Fees</th>
+                        <th>MediQuick Revenue (10%)</th>
+                    </tr>
+                </thead>
+                <tbody id="yearlyEarningsBody">
+                    <tr>
+                        <td colspan="4" class="loading">Loading yearly earnings data...</td>
+                    </tr>
+                </tbody>
+            </table>
+    
+            <h2>Earnings by Doctor Specialization</h2>
+            <table id="specializationEarningsTable">
+                <thead>
+                    <tr>
+                        <th>Specialization</th>
+                        <th>Total Appointments</th>
+                        <th>Total Fees</th>
+                        <th>MediQuick Revenue (10%)</th>
+                        <th>Average Fee</th>
+                    </tr>
+                </thead>
+                <tbody id="specializationEarningsBody">
+                    <tr>
+                        <td colspan="5" class="loading">Loading specialization data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
         </div>
        
@@ -424,7 +540,48 @@
             }
 
             // Fetch and display appointments data
-           
+            function loadAppointments() {
+                const tbody = document.getElementById('appointmentsBody');
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading appointments...</td></tr>';
+
+                fetch('/admin/api/appointments')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        tbody.innerHTML = '';
+
+                        if (data.error) {
+                            tbody.innerHTML = `<tr><td colspan="6" class="error">${data.error}</td></tr>`;
+                            return;
+                        }
+
+                        if (data.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="empty">No pending appointments found</td></tr>';
+                            return;
+                        }
+
+                        data.forEach(appt => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                    <td>${appt.patientName}</td>
+                    <td>${appt.doctorName}</td>
+                    <td>${appt.date}</td>
+                    <td>${appt.time}</td>
+                    <td>$${appt.fee.toFixed(2)}</td>
+                    <td>$${appt.revenue.toFixed(2)}</td>
+                `;
+                            tbody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading appointments:', error);
+                        tbody.innerHTML = '<tr><td colspan="6" class="error">Error loading appointments. Please try again.</td></tr>';
+                    });
+            }
 
             // Fetch and display finance data
 //             function loadFinanceData() {
@@ -843,15 +1000,238 @@
 //             tbody.innerHTML = '<tr><td colspan="7" class="error">Error loading finance data</td></tr>';
 //         });
 // }
+function loadFinanceData() {
+    const tbody = document.getElementById('financeBody');
+    tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading finance data...</td></tr>';
 
+    fetch('/admin/api/finance')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="7" class="error">${data.error}</td></tr>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty">No financial data found</td></tr>';
+                return;
+            }
+
+            let totalFees = 0;
+            let totalRevenue = 0;
+
+            data.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.patientName}</td>
+                    <td>${transaction.doctorName}</td>
+                    <td>${transaction.specialization}</td>
+                    <td>${transaction.date}</td>
+                    <td>$${transaction.fee.toFixed(2)}</td>
+                    <td>$${transaction.revenue.toFixed(2)}</td>
+                    <td><span class="status ${transaction.status}">${transaction.status}</span></td>
+                `;
+                tbody.appendChild(row);
+
+                totalFees += parseFloat(transaction.fee);
+                totalRevenue += parseFloat(transaction.revenue);
+            });
+
+            // Update totals in footer
+            document.getElementById('totalFees').textContent = `$${totalFees.toFixed(2)}`;
+            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+        })
+        .catch(error => {
+            console.error('Error loading finance data:', error);
+            tbody.innerHTML = '<tr><td colspan="7" class="error">Error loading finance data</td></tr>';
+        });
+}
+function loadRevenueSummary() {
+    fetch('/admin/api/revenue-summary')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error loading revenue summary:', data.error);
+                return;
+            }
+
+            document.getElementById('totalRevenue').textContent = `$${data.summary.totalRevenue.toFixed(2)}`;
+            document.getElementById('totalFees').textContent = `$${data.summary.totalFees.toFixed(2)}`;
+            document.getElementById('totalAppointments').textContent = data.summary.totalAppointments;
+        })
+        .catch(error => {
+            console.error('Error loading revenue summary:', error);
+        });
+}
+
+function loadEarningsData() {
+    loadDailyEarnings();
+    loadMonthlyEarnings();
+    loadYearlyEarnings();
+    loadSpecializationEarnings();
+    loadRevenueSummary();
+}
+
+function loadDailyEarnings() {
+    const tbody = document.getElementById('dailyEarningsBody');
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading daily earnings...</td></tr>';
+
+    fetch('/admin/api/earnings')
+        .then(response => response.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+                return;
+            }
+
+            if (!data.daily || data.daily.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No daily earnings data</td></tr>';
+                return;
+            }
+
+            data.daily.forEach(day => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${day.date}</td>
+                    <td>${day.count}</td>
+                    <td>$${day.totalFees.toFixed(2)}</td>
+                    <td>$${day.totalRevenue.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading daily earnings:', error);
+            tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+        });
+}
+
+function loadMonthlyEarnings() {
+    const tbody = document.getElementById('monthlyEarningsBody');
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading monthly earnings...</td></tr>';
+
+    fetch('/admin/api/earnings')
+        .then(response => response.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+                return;
+            }
+
+            if (!data.monthly || data.monthly.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No monthly earnings data</td></tr>';
+                return;
+            }
+
+            data.monthly.forEach(month => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${month.month}</td>
+                    <td>${month.count}</td>
+                    <td>$${month.totalFees.toFixed(2)}</td>
+                    <td>$${month.totalRevenue.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading monthly earnings:', error);
+            tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+        });
+}
+
+function loadYearlyEarnings() {
+    const tbody = document.getElementById('yearlyEarningsBody');
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading yearly earnings...</td></tr>';
+
+    fetch('/admin/api/earnings')
+        .then(response => response.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+                return;
+            }
+
+            if (!data.yearly || data.yearly.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No yearly earnings data</td></tr>';
+                return;
+            }
+
+            data.yearly.forEach(year => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year.year}</td>
+                    <td>${year.count}</td>
+                    <td>$${year.totalFees.toFixed(2)}</td>
+                    <td>$${year.totalRevenue.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading yearly earnings:', error);
+            tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+        });
+}
+
+function loadSpecializationEarnings() {
+    const tbody = document.getElementById('specializationEarningsBody');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading specialization data...</td></tr>';
+
+    fetch('/admin/api/revenue-summary')
+        .then(response => response.json())
+        .then(data => {
+            tbody.innerHTML = '';
+
+            if (data.error) {
+                tbody.innerHTML = `<tr><td colspan="5">${data.error}</td></tr>`;
+                return;
+            }
+
+            if (!data.bySpecialization || data.bySpecialization.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No specialization data</td></tr>';
+                return;
+            }
+
+            data.bySpecialization.forEach(spec => {
+                const avgFee = spec.count > 0 ? spec.totalFees / spec.count : 0;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${spec.specialization}</td>
+                    <td>${spec.count}</td>
+                    <td>$${spec.totalFees.toFixed(2)}</td>
+                    <td>$${spec.totalRevenue.toFixed(2)}</td>
+                    <td>$${avgFee.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading specialization earnings:', error);
+            tbody.innerHTML = '<tr><td colspan="5">Error loading data</td></tr>';
+        });
+}
+            
 
             // Load data when page loads
             document.addEventListener('DOMContentLoaded', () => {
                 loadSignins();
-                
+                loadAppointments();
                 fetchUsers();
                 updateFilterInput();
-                
+                loadFinanceData(); // NEW - Use the new finance function
+                loadEarningsData();
             });
 
             $(document).ready(function () {
