@@ -512,7 +512,19 @@
                 </div>
             </div>
 
+            <div class="appointment-history">
+                <h2 style="color: var(--blue); font-size: 2rem;">Previous Appointments</h2>
+                <div id="previousAppointments">
+                    <div class="loader"></div>
+                </div>
+            </div>
             
+            <div class="future-appointments">
+                <h2 style="color: var(--blue); font-size: 2rem;">Upcoming Appointments</h2>
+                <div id="upcomingAppointments">
+                    <div class="loader"></div>
+                </div>
+            </div>
             
             <a href="/patient/edit-profile"><button class="button">Edit Profile</button></a>
         </div>
@@ -528,13 +540,103 @@
 
 
         // Function to fetch appointments
-        
+        async function fetchAppointments(type) {
+            const container = document.getElementById(`${type}Appointments`);
+            
+            try {
+                const response = await fetch(`/patient/api/patient/appointments/${type}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${type} appointments`);
+                }
+                
+                const appointments = await response.json();
+                
+                if (appointments.length === 0) {
+                    container.innerHTML = `<p>No ${type} appointments found.</p>`;
+                    return;
+                }
+                
+                // Create HTML for appointments
+                const appointmentsHTML = `
+                    <ul class="appointment-list">
+                        ${appointments.map(appointment => `
+                            <li>
+                                <strong>Dr. ${appointment.doctorName}</strong> (${appointment.specialization})<br>
+                                <strong>Date:</strong> ${appointment.date} at ${appointment.time}<br>
+                                <strong>Type:</strong> ${appointment.type}<br>
+                                <strong>Status:</strong> <span class="status-${appointment.status.toLowerCase()}">
+                                    ${appointment.status}
+                                </span>
+                                ${appointment.notes ? `<br><strong>Notes:</strong> ${appointment.notes}` : ''}
+                                ${type === 'upcoming' ? `
+                                    <div style="margin-top: 5px;">
+                                        ${appointment.status === 'confirmed' ? `
+                                            <button onclick="openChat('${appointment.id}')" class="chat-btn">
+                                                Chat with Doctor
+                                            </button>
+                                        ` : ''}
+                                        <button onclick="cancelAppointment('${appointment.id}')" 
+                                            class="cancel-btn">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                
+                container.innerHTML = appointmentsHTML;
+            } catch (error) {
+                console.error(`Error fetching ${type} appointments:`, error);
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p>Failed to load ${type} appointments.</p>
+                        <button class="retry-btn" onclick="fetchAppointments('${type}')">Retry</button>
+                    </div>
+                `;
+            }
+        }
         // Load patient data asynchronously
-
+async function loadPatientData() {
+    try {
+        console.log('Fetching patient profile data...');
+        
+        const response = await fetch('/patient/profile-data', {
+            credentials: 'same-origin'
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to load profile data');
+        }
+        
+        // Populate patient details
+        document.getElementById('patientName').textContent = data.patient.name;
+        document.getElementById('patientEmail').textContent = 'Email: ' + data.patient.email;
+        document.getElementById('patientMobile').textContent = 'Mobile: ' + data.patient.mobile;
+        document.getElementById('patientAddress').textContent = 'Address: ' + data.patient.address;
+        
+    } catch (error) {
+        console.error('Error loading patient profile data:', error);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = `Error loading profile data: ${error.message}`;
+        document.querySelector('.profile-info').appendChild(errorDiv);
+    }
+}
 
         // Fetch appointments when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            
+            loadPatientData();
+            fetchAppointments('previous');
+            fetchAppointments('upcoming');
         });
 
         // Rest of your existing JavaScript functions...
@@ -563,7 +665,37 @@
         //         });
         //     }
         // }
-        
+        function cancelAppointment(appointmentId) {
+    if (confirm('Are you sure you want to cancel this appointment?')) {
+        fetch(`/appointment/patient/${appointmentId}/cancel`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include' // Important for session cookies
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || errorData.details || 'Failed to cancel appointment');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message) {
+                alert('Appointment cancelled successfully');
+                // Refresh the appointments
+                fetchAppointments('upcoming');
+                fetchAppointments('previous'); // Also refresh previous as this is now a past appointment
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while cancelling the appointment');
+        });
+    }
+}
 
         function closeProfile() {
             window.location.href = "/patient/dashboard";
@@ -666,7 +798,7 @@
             }
         }, 5000);
     </script>
-// modified patinent profile to allow viewing and cancelling appointments
+
 </body>
 
 </html>
