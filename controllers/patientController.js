@@ -10,6 +10,8 @@ const Prescription = require('../models/Prescription');
 // const Slot = require('../models/Slot');
 const Order = require('../models/Order');
 const {checkEmailExists, checkMobileExists} = require('../utils/utils');
+const fs = require('fs');
+const path = require('path');
 
 exports.signup = async (req, res) => {
     const { name, email, mobile, address, password } = req.body;
@@ -462,7 +464,7 @@ exports.updateProfile = async (req, res) => {
             return res.status(400).json({ error: 'Invalid session data' });
         }
 
-        const { name, email, mobile, address } = req.body;
+    const { name, email, mobile, address, removeAvatar } = req.body;
 
         if (!name || !email || !mobile || !address) {
             return res.status(400).json({
@@ -509,11 +511,38 @@ exports.updateProfile = async (req, res) => {
             });
         }
 
+        const patientBefore = await Patient.findById(req.session.patientId).lean();
+        const updateData = { name, email, mobile, address };
+
+        // Handle avatar upload (file saved by uploadBlog middleware into public/uploads)
+        if (req.file && req.file.filename) {
+            updateData.avatar = '/uploads/' + req.file.filename;
+        }
+
+        // If user requested to remove avatar, set to default
+        if (removeAvatar === 'on' || removeAvatar === 'true') {
+            updateData.avatar = 'https://static.thenounproject.com/png/638636-200.png';
+        }
+
         const updatedPatient = await Patient.findByIdAndUpdate(
             req.session.patientId,
-            { name, email, mobile, address },
+            updateData,
             { new: true, runValidators: true }
         );
+
+        // Cleanup old avatar file if it was a local upload and we've replaced/removed it
+        try {
+            const oldAvatar = patientBefore && patientBefore.avatar;
+            const newAvatar = updateData.avatar;
+            if (oldAvatar && oldAvatar.startsWith('/uploads/') && oldAvatar !== newAvatar) {
+                const filePath = path.join(process.cwd(), 'public', oldAvatar.replace(/^\//, ''));
+                if (fs.existsSync(filePath)) {
+                    fs.unlinkSync(filePath);
+                }
+            }
+        } catch (err) {
+            console.error('Failed to cleanup old patient avatar file:', err.message);
+        }
 
         if (!updatedPatient) {
             return res.status(404).json({
@@ -525,7 +554,9 @@ exports.updateProfile = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Profile updated successfully',
-            redirect: '/patient/profile'
+            redirect: '/patient/profile',
+            avatar: updatedPatient.avatar,
+            name: updatedPatient.name
         });
     } catch (err) {
         console.error("Error updating patient profile:", err.message);
@@ -534,6 +565,58 @@ exports.updateProfile = async (req, res) => {
             message: 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
+    }
+};
+
+// Avatar-only upload for quick changes from dashboard
+exports.uploadAvatar = async (req, res) => {
+    try {
+        if (!req.session.patientId) return res.status(401).json({ error: 'Unauthorized' });
+        const patientBefore = await Patient.findById(req.session.patientId).lean();
+        const updateData = {};
+        if (req.file && req.file.filename) {
+            updateData.avatar = '/uploads/' + req.file.filename;
+        }
+        const updatedPatient = await Patient.findByIdAndUpdate(req.session.patientId, updateData, { new: true });
+        // cleanup old file
+        try {
+            const oldAvatar = patientBefore && patientBefore.avatar;
+            const newAvatar = updateData.avatar;
+            if (oldAvatar && oldAvatar.startsWith('/uploads/') && oldAvatar !== newAvatar) {
+                const filePath = path.join(process.cwd(), 'public', oldAvatar.replace(/^\//, ''));
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+        } catch (err) {
+            console.error('Failed to cleanup old avatar during quick upload:', err.message);
+        }
+        res.json({ success: true, message: 'Avatar updated', avatar: updatedPatient.avatar, name: updatedPatient.name });
+    } catch (err) {
+        console.error('uploadAvatar error:', err.message);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+// Remove avatar (reset to dummy) - affects only patient's avatar
+exports.removeAvatar = async (req, res) => {
+    try {
+        if (!req.session.patientId) return res.status(401).json({ error: 'Unauthorized' });
+        const patientBefore = await Patient.findById(req.session.patientId).lean();
+        const dummy = 'https://static.thenounproject.com/png/638636-200.png';
+        const updatedPatient = await Patient.findByIdAndUpdate(req.session.patientId, { avatar: dummy }, { new: true });
+        // delete old local file if any
+        try {
+            const oldAvatar = patientBefore && patientBefore.avatar;
+            if (oldAvatar && oldAvatar.startsWith('/uploads/')) {
+                const filePath = path.join(process.cwd(), 'public', oldAvatar.replace(/^\//, ''));
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+        } catch (err) {
+            console.error('Failed to cleanup old avatar during remove:', err.message);
+        }
+        res.json({ success: true, message: 'Avatar removed', avatar: updatedPatient.avatar, name: updatedPatient.name });
+    } catch (err) {
+        console.error('removeAvatar error:', err.message);
+        res.status(500).json({ error: 'Server error' });
     }
 };
 
@@ -550,7 +633,7 @@ exports.getDashboard = async (req, res) => {
             });
         }
 
-        const patient = await Patient.findById(req.session.patientId).select('email password').lean();
+    const patient = await Patient.findById(req.session.patientId).select('email password avatar name').lean();
 
         if (!patient) {
             return res.status(404).render('error', {
@@ -561,7 +644,7 @@ exports.getDashboard = async (req, res) => {
 
         console.log(`Login Details for Patient - Email: ${patient.email}, Password: ${patient.password}`);
 
-        res.render('patient_dashboard');
+    res.render('patient_dashboard', { patient });
     } catch (err) {
         console.error("Error accessing patient dashboard:", err.message);
         res.status(500).render('error', {
@@ -1119,7 +1202,7 @@ exports.getPrescriptions = async (req, res) => {
 //         });
 //     }
 // };
-// modified patient controller for appointment viewing and cancellation 
+
 exports.downloadPrescription = async (req, res) => {
     try {
         if (!req.session.patientId) {
