@@ -68,5 +68,3 @@ const uploadBlog = multer({
 });
 
 module.exports = { upload, uploadBlog };
-
-
