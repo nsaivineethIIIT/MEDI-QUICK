@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 const { DOCTOR_SECURITY_CODE } = require('../constants/constants');
 
 const {checkEmailExists, checkMobileExists} = require('../utils/utils');
-// modified doctor controller to allow appointment viewing and cancellation
+const fs = require('fs');
+const path = require('path');
+
 exports.signup = async (req, res) => {
     const {
         name, email, mobile, address, registrationNumber,
@@ -21,7 +23,7 @@ exports.signup = async (req, res) => {
     });
 
     try {
-        
+        // Validate required fields
         if (!name || !email || !mobile || !address || !registrationNumber ||
             !college || !yearOfPassing || !location || !onlineStatus || !securityCode || !password) {
             console.log('Validation failed: Missing required fields', {
@@ -660,7 +662,7 @@ exports.updateProfile = async (req, res) => {
             return res.status(400).json({ error: 'Invalid session data' });
         }
 
-        const { name, email, mobile, address, specialization, college, yearOfPassing, location, onlineStatus, consultationFee } = req.body;
+    const { name, email, mobile, address, specialization, college, yearOfPassing, location, onlineStatus, consultationFee, removeAvatar } = req.body;
 
         if (!name || !email || !mobile || !address || !specialization || !college || !yearOfPassing || !location || !onlineStatus || !consultationFee) {
             console.log('Validation failed: Missing required fields');
@@ -693,9 +695,21 @@ exports.updateProfile = async (req, res) => {
             return res.status(400).json({ error: 'Mobile number already in use' });
         }
 
+        const doctorBefore = await Doctor.findById(req.session.doctorId).lean();
+        const updateData = { name, email, mobile, address, specialization, college, yearOfPassing, location, onlineStatus, consultationFee };
+
+        // handle avatar file if uploaded (uploadBlog stores in public/uploads)
+        if (req.file && req.file.filename) {
+            updateData.avatar = '/uploads/' + req.file.filename;
+        }
+
+        if (removeAvatar === 'on' || removeAvatar === 'true') {
+            updateData.avatar = 'https://static.thenounproject.com/png/638636-200.png';
+        }
+
         const updatedDoctor = await Doctor.findByIdAndUpdate(
             req.session.doctorId,
-            { name, email, mobile, address, specialization, college, yearOfPassing, location, onlineStatus, consultationFee },
+            updateData,
             { new: true, runValidators: true }
         );
 
@@ -704,11 +718,25 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).json({ error: 'Doctor not found' });
         }
 
+        // Cleanup old avatar file if local and replaced/removed
+        try {
+            const oldAvatar = doctorBefore && doctorBefore.avatar;
+            const newAvatar = updateData.avatar;
+            if (oldAvatar && oldAvatar.startsWith('/uploads/') && oldAvatar !== newAvatar) {
+                const filePath = path.join(process.cwd(), 'public', oldAvatar.replace(/^\//, ''));
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+        } catch (err) {
+            console.error('Failed to cleanup old doctor avatar file:', err.message);
+        }
+
         console.log('Doctor profile updated successfully:', updatedDoctor);
         res.status(200).json({
             success: true,
             message: 'Profile updated successfully',
-            redirect: '/doctor/profile'
+            redirect: '/doctor/profile',
+            avatar: updatedDoctor.avatar,
+            name: updatedDoctor.name
         });
     } catch (err) {
         console.error("Error updating doctor profile:", err.message);
@@ -1428,5 +1456,28 @@ exports.downloadPrescription = async (req, res) => {
             error: 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
+    }
+};
+
+// Remove avatar for doctor (reset to dummy and delete local file)
+exports.removeAvatar = async (req, res) => {
+    try {
+        if (!req.session.doctorId) return res.status(401).json({ error: 'Unauthorized' });
+        const doctorBefore = await Doctor.findById(req.session.doctorId).lean();
+        const dummy = 'https://static.thenounproject.com/png/638636-200.png';
+        const updatedDoctor = await Doctor.findByIdAndUpdate(req.session.doctorId, { avatar: dummy }, { new: true });
+        try {
+            const oldAvatar = doctorBefore && doctorBefore.avatar;
+            if (oldAvatar && oldAvatar.startsWith('/uploads/')) {
+                const filePath = path.join(process.cwd(), 'public', oldAvatar.replace(/^\//, ''));
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            }
+        } catch (err) {
+            console.error('Failed to cleanup old doctor avatar during remove:', err.message);
+        }
+        res.json({ success: true, message: 'Avatar removed', avatar: updatedDoctor.avatar, name: updatedDoctor.name });
+    } catch (err) {
+        console.error('doctor removeAvatar error:', err.message);
+        res.status(500).json({ error: 'Server error' });
     }
 };
