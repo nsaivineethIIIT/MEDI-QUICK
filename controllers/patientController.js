@@ -1119,7 +1119,7 @@ exports.getPrescriptions = async (req, res) => {
 //         });
 //     }
 // };
-
+// modified patient controller for appointment viewing and cancellation 
 exports.downloadPrescription = async (req, res) => {
     try {
         if (!req.session.patientId) {
