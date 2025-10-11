@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const doctorController = require('../controllers/doctorController');
 const { upload } = require('../middlewares/upload');
-
+// modified doctor routes to complete implementation of appointment booking and cancellation
 router.get('/dashboard', doctorController.getDashboard); // Doctor dashboard
 router.get('/api/daily-earnings', doctorController.getDailyEarnings); // Get daily earnings
 router.get('/form', doctorController.getForm); // Get form
