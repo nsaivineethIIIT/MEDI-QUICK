@@ -6,6 +6,8 @@ const path = require('path');
 const session = require('express-session');
 const app = express();
 const port = 3001;
+const Patient = require('./models/Patient');
+const Doctor = require('./models/Doctor');
 
 // Add this before your routes
 app.use(express.urlencoded({ extended: true }));
@@ -32,7 +34,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+// Serve uploaded files from public/uploads (where multer stores blog/avatar uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.set('views', path.join(__dirname, 'views'));
 
 const multer = require('multer');
@@ -89,6 +92,36 @@ app.use(session({
     }
 }));
 
+// Make current user's basic info (avatar/name) available to all views
+app.use(async (req, res, next) => {
+    try {
+        res.locals.currentUser = null;
+        // Prefer doctor session if both are somehow present
+        if (req.session && req.session.doctorId) {
+            if (mongoose.Types.ObjectId.isValid(req.session.doctorId)) {
+                const d = await Doctor.findById(req.session.doctorId).select('name avatar').lean();
+                if (d) {
+                    res.locals.currentUser = { type: 'doctor', name: d.name, avatar: d.avatar };
+                    return next();
+                }
+            }
+        }
+
+        if (req.session && req.session.patientId) {
+            if (mongoose.Types.ObjectId.isValid(req.session.patientId)) {
+                const p = await Patient.findById(req.session.patientId).select('name avatar').lean();
+                if (p) {
+                    res.locals.currentUser = { type: 'patient', name: p.name, avatar: p.avatar };
+                }
+            }
+        }
+    } catch (err) {
+        // don't block rendering if this fails
+        console.error('Error setting currentUser in res.locals:', err.message);
+    }
+    next();
+});
+
 // Route imports
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -126,7 +159,7 @@ app.get('/admin_form', (req, res) => res.redirect('/admin_form'));
 app.get('/supplier_form', (req, res) => res.redirect('/supplier_form'));
 app.get('/employee_form', (req, res) => res.redirect('/employee_form'));
 app.get('/', (req, res) => res.redirect('/'));
-app.get('/logout', (req, res) => res.redirect('/logout'));
+// note: logout route handled by homeRoutes
 app.get('/test-error', (req, res) => res.redirect('/test-error'));
 
 // Error handling middleware
@@ -143,7 +176,6 @@ app.use((err, req, res, next) => {
 mongoose.connection.once('open', () => {
     app.listen(port, () => {
         console.log(`Server running on http://localhost:${port}`);
-        console.log('Current date and time:', new Date('2025-09-12T03:47:00Z').toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }));
     });
 });
 
