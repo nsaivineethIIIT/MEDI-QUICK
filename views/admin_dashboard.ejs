@@ -162,6 +162,7 @@
                 <li><a href="#upcoming">Recent SignIns</a></li>
                 <li><a href="#finance">Finance</a></li>
                 <li><a href="#users">Manage Users</a></li>
+                <li><a href="/admin/search-data">Search data</a> </li>
                 <li><a href="/admin/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
                             alt="Profile Image" height="30px" width="30px"></a></li>
             </ul>
@@ -581,6 +582,424 @@
                         tbody.innerHTML = '<tr><td colspan="6" class="error">Error loading appointments. Please try again.</td></tr>';
                     });
             }
+
+            // Fetch and display finance data
+//             function loadFinanceData() {
+//                 const tbody = document.getElementById('financeBody');
+//                 tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading finance data...</td></tr>';
+
+//                 fetch('/api/admin/appointments')
+//                     .then(response => {
+//                         if (!response.ok) {
+//                             throw new Error('Network response was not ok');
+//                         }
+//                         return response.json();
+//                     })
+//                     .then(data => {
+//                         tbody.innerHTML = '';
+
+//                         if (data.error) {
+//                             tbody.innerHTML = `<tr><td colspan="6" class="error">${data.error}</td></tr>`;
+//                             return;
+//                         }
+
+//                         if (data.length === 0) {
+//                             tbody.innerHTML = '<tr><td colspan="6" class="empty">No financial data found</td></tr>';
+//                             return;
+//                         }
+
+//                         let totalFees = 0;
+//                         let totalRevenue = 0;
+
+//                         data.forEach(appt => {
+//                             const row = document.createElement('tr');
+//                             row.innerHTML = `
+//                                 <td>${appt.patientName}</td>
+//                                 <td>${appt.doctorName}</td>
+//                                 <td>${appt.date}</td>
+//                                 <td>$${appt.fee.toFixed(2)}</td>
+//                                 <td>$${appt.revenue.toFixed(2)}</td>
+//                                 <td>${appt.status === 'completed' ? 'Completed' : 'Pending'}</td>
+//                             `;
+//                             tbody.appendChild(row);
+
+//                             totalFees += parseFloat(appt.fee);
+//                             totalRevenue += parseFloat(appt.revenue);
+//                         });
+
+//                         // Update totals
+//                         document.getElementById('totalFees').textContent = `$${totalFees.toFixed(2)}`;
+//                         document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+//                     })
+//                     .catch(error => {
+//                         console.error('Error loading finance data:', error);
+//                         tbody.innerHTML = '<tr><td colspan="6" class="error">Error loading finance data. Please try again.</td></tr>';
+//                     });
+//             }
+//             function loadDailyEarnings() {
+//         const tbody = document.getElementById('dailyEarningsBody');
+//         tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading daily earnings...</td></tr>';
+
+//         fetch('/api/admin/appointments')
+//             .then(response => response.json())
+//             .then(data => {
+//                 if (data.error) {
+//                     tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+//                     return;
+//                 }
+
+//                 // Group by date
+//                 const dailyGroups = data.reduce((acc, appt) => {
+//                     const date = appt.date; // Assuming this is already formatted as YYYY-MM-DD
+//                     if (!acc[date]) {
+//                         acc[date] = {
+//                             date,
+//                             count: 0,
+//                             totalFees: 0,
+//                             totalRevenue: 0
+//                         };
+//                     }
+//                     acc[date].count++;
+//                     acc[date].totalFees += appt.fee;
+//                     acc[date].totalRevenue += appt.revenue;
+//                     return acc;
+//                 }, {});
+
+//                 // Convert to array and sort by date (newest first)
+//                 const dailyArray = Object.values(dailyGroups).sort((a, b) => 
+//                     new Date(b.date) - new Date(a.date));
+
+//                 tbody.innerHTML = '';
+                
+//                 if (dailyArray.length === 0) {
+//                     tbody.innerHTML = '<tr><td colspan="4">No appointment data found</td></tr>';
+//                     return;
+//                 }
+
+//                 dailyArray.forEach(day => {
+//                     const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                         <td>${day.date}</td>
+//                         <td>${day.count}</td>
+//                         <td>$${day.totalFees.toFixed(2)}</td>
+//                         <td>$${day.totalRevenue.toFixed(2)}</td>
+//                     `;
+//                     tbody.appendChild(row);
+//                 });
+//             })
+//             .catch(error => {
+//                 console.error('Error loading daily earnings:', error);
+//                 tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+//             });
+//     }
+
+//     function loadSpecializationEarnings() {
+//     const tbody = document.getElementById('specializationEarningsBody');
+//     tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading specialization data...</td></tr>';
+
+//     fetch('/api/admin/appointments')
+//         .then(response => response.json())
+//         .then(appointments => {
+//             if (appointments.error) {
+//                 tbody.innerHTML = `<tr><td colspan="5">${appointments.error}</td></tr>`;
+//                 return;
+//             }
+
+//             // Group by specialization
+//             const specGroups = {};
+            
+//             appointments.forEach(appt => {
+//                 // Make sure we're using the correct specialization field
+//                 const spec = appt.specialization || 'General Physician';
+                
+//                 if (!specGroups[spec]) {
+//                     specGroups[spec] = {
+//                         specialization: spec,
+//                         count: 0,
+//                         totalFees: 0,
+//                         totalRevenue: 0
+//                     };
+//                 }
+                
+//                 specGroups[spec].count++;
+//                 specGroups[spec].totalFees += appt.fee || 0;
+//                 specGroups[spec].totalRevenue += appt.revenue || 0;
+//             });
+
+//             // Convert to array and sort by total fees (highest first)
+//             const specArray = Object.values(specGroups).sort((a, b) => 
+//                 b.totalFees - a.totalFees);
+
+//             tbody.innerHTML = '';
+            
+//             if (specArray.length === 0) {
+//                 tbody.innerHTML = '<tr><td colspan="5">No specialization data found</td></tr>';
+//                 return;
+//             }
+
+//             specArray.forEach(spec => {
+//                 const avgFee = spec.count > 0 ? spec.totalFees / spec.count : 0;
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${spec.specialization}</td>
+//                     <td>${spec.count}</td>
+//                     <td>$${spec.totalFees.toFixed(2)}</td>
+//                     <td>$${spec.totalRevenue.toFixed(2)}</td>
+//                     <td>$${avgFee.toFixed(2)}</td>
+//                 `;
+//                 tbody.appendChild(row);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error loading specialization earnings:', error);
+//             tbody.innerHTML = '<tr><td colspan="5">Error loading data</td></tr>';
+//         });
+// }
+// function loadMonthlyEarnings() {
+//     const tbody = document.getElementById('monthlyEarningsBody');
+//     tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading monthly earnings...</td></tr>';
+
+//     fetch('/api/admin/earnings')
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.error) {
+//                 tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+//                 return;
+//             }
+
+//             tbody.innerHTML = '';
+            
+//             if (!data.monthly || data.monthly.length === 0) {
+//                 tbody.innerHTML = '<tr><td colspan="4">No monthly earnings data found</td></tr>';
+//                 return;
+//             }
+
+//             data.monthly.forEach(month => {
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${month.month}</td>
+//                     <td>${month.count}</td>
+//                     <td>$${month.totalFees.toFixed(2)}</td>
+//                     <td>$${month.totalRevenue.toFixed(2)}</td>
+//                 `;
+//                 tbody.appendChild(row);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error loading monthly earnings:', error);
+//             tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+//         });
+// }
+
+// function loadYearlyEarnings() {
+//     const tbody = document.getElementById('yearlyEarningsBody');
+//     tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading yearly earnings...</td></tr>';
+
+//     fetch('/api/admin/earnings')
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.error) {
+//                 tbody.innerHTML = `<tr><td colspan="4">${data.error}</td></tr>`;
+//                 return;
+//             }
+
+//             tbody.innerHTML = '';
+            
+//             if (!data.yearly || data.yearly.length === 0) {
+//                 tbody.innerHTML = '<tr><td colspan="4">No yearly earnings data found</td></tr>';
+//                 return;
+//             }
+
+//             data.yearly.forEach(year => {
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${year.year}</td>
+//                     <td>${year.count}</td>
+//                     <td>$${year.totalFees.toFixed(2)}</td>
+//                     <td>$${year.totalRevenue.toFixed(2)}</td>
+//                 `;
+//                 tbody.appendChild(row);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error loading yearly earnings:', error);
+//             tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+//         });
+// }
+// function loadEarningsData() {
+//     const dailyTbody = document.getElementById('dailyEarningsBody');
+//     const monthlyTbody = document.getElementById('monthlyEarningsBody');
+//     const yearlyTbody = document.getElementById('yearlyEarningsBody');
+//     const specTbody = document.getElementById('specializationEarningsBody');
+
+//     // Set loading states
+//     dailyTbody.innerHTML = '<tr><td colspan="4" class="loading">Loading daily earnings data...</td></tr>';
+//     monthlyTbody.innerHTML = '<tr><td colspan="4" class="loading">Loading monthly earnings data...</td></tr>';
+//     yearlyTbody.innerHTML = '<tr><td colspan="4" class="loading">Loading yearly earnings data...</td></tr>';
+//     specTbody.innerHTML = '<tr><td colspan="5" class="loading">Loading specialization data...</td></tr>';
+
+//     // Fetch earnings data
+//     fetch('/api/admin/earnings')
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             // Handle daily earnings
+//             dailyTbody.innerHTML = '';
+//             if (!data.daily || data.daily.length === 0) {
+//                 dailyTbody.innerHTML = '<tr><td colspan="4">No daily earnings data found</td></tr>';
+//             } else {
+//                 data.daily.forEach(day => {
+//                     const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                         <td>${day.date}</td>
+//                         <td>${day.count}</td>
+//                         <td>$${day.totalFees.toFixed(2)}</td>
+//                         <td>$${day.totalRevenue.toFixed(2)}</td>
+//                     `;
+//                     dailyTbody.appendChild(row);
+//                 });
+//             }
+
+//             // Handle monthly earnings
+//             monthlyTbody.innerHTML = '';
+//             if (!data.monthly || data.monthly.length === 0) {
+//                 monthlyTbody.innerHTML = '<tr><td colspan="4">No monthly earnings data found</td></tr>';
+//             } else {
+//                 data.monthly.forEach(month => {
+//                     const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                         <td>${month.month}</td>
+//                         <td>${month.count}</td>
+//                         <td>$${month.totalFees.toFixed(2)}</td>
+//                         <td>$${month.totalRevenue.toFixed(2)}</td>
+//                     `;
+//                     monthlyTbody.appendChild(row);
+//                 });
+//             }
+
+//             // Handle yearly earnings
+//             yearlyTbody.innerHTML = '';
+//             if (!data.yearly || data.yearly.length === 0) {
+//                 yearlyTbody.innerHTML = '<tr><td colspan="4">No yearly earnings data found</td></tr>';
+//             } else {
+//                 data.yearly.forEach(year => {
+//                     const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                         <td>${year.year}</td>
+//                         <td>${year.count}</td>
+//                         <td>$${year.totalFees.toFixed(2)}</td>
+//                         <td>$${year.totalRevenue.toFixed(2)}</td>
+//                     `;
+//                     yearlyTbody.appendChild(row);
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error loading earnings data:', error);
+//             dailyTbody.innerHTML = '<tr><td colspan="4">Error loading daily earnings data</td></tr>';
+//             monthlyTbody.innerHTML = '<tr><td colspan="4">Error loading monthly earnings data</td></tr>';
+//             yearlyTbody.innerHTML = '<tr><td colspan="4">Error loading yearly earnings data</td></tr>';
+//         });
+
+//     // Fetch specialization earnings separately from appointments
+//     fetch('/api/admin/appointments')
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.json();
+//         })
+//         .then(appointments => {
+//             specTbody.innerHTML = '';
+//             if (!appointments || appointments.length === 0) {
+//                 specTbody.innerHTML = '<tr><td colspan="5">No specialization data found</td></tr>';
+//                 return;
+//             }
+
+//             // Group by specialization
+//             const specGroups = {};
+//             appointments.forEach(appt => {
+//                 const spec = appt.specialization || 'General Physician';
+//                 if (!specGroups[spec]) {
+//                     specGroups[spec] = {
+//                         specialization: spec,
+//                         count: 0,
+//                         totalFees: 0,
+//                         totalRevenue: 0
+//                     };
+//                 }
+//                 specGroups[spec].count++;
+//                 specGroups[spec].totalFees += appt.fee || 0;
+//                 specGroups[spec].totalRevenue += appt.revenue || 0;
+//             });
+
+//             // Convert to array and sort by total fees (highest first)
+//             const specArray = Object.values(specGroups).sort((a, b) => b.totalFees - a.totalFees);
+
+//             specArray.forEach(spec => {
+//                 const avgFee = spec.count > 0 ? spec.totalFees / spec.count : 0;
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${spec.specialization}</td>
+//                     <td>${spec.count}</td>
+//                     <td>$${spec.totalFees.toFixed(2)}</td>
+//                     <td>$${spec.totalRevenue.toFixed(2)}</td>
+//                     <td>$${avgFee.toFixed(2)}</td>
+//                 `;
+//                 specTbody.appendChild(row);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error loading specialization earnings:', error);
+//             specTbody.innerHTML = '<tr><td colspan="5">Error loading specialization data</td></tr>';
+//         });
+// }
+
+// function loadFinanceData() {
+//     const tbody = document.getElementById('financeBody');
+//     tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading finance data...</td></tr>';
+
+//     fetch('/admin/api/finance')
+//         .then(response => {
+//             if (!response.ok) throw new Error('Network response was not ok');
+//             return response.json();
+//         })
+//         .then(data => {
+//             tbody.innerHTML = '';
+
+//             if (data.error) {
+//                 tbody.innerHTML = `<tr><td colspan="7" class="error">${data.error}</td></tr>`;
+//                 return;
+//             }
+
+//             if (data.length === 0) {
+//                 tbody.innerHTML = '<tr><td colspan="7" class="empty">No financial data found</td></tr>';
+//                 return;
+//             }
+
+//             data.forEach(transaction => {
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${transaction.patientName}</td>
+//                     <td>${transaction.doctorName}</td>
+//                     <td>${transaction.specialization}</td>
+//                     <td>${transaction.date}</td>
+//                     <td>$${transaction.fee.toFixed(2)}</td>
+//                     <td>$${transaction.revenue.toFixed(2)}</td>
+//                     <td><span class="status ${transaction.status}">${transaction.status}</span></td>
+//                 `;
+//                 tbody.appendChild(row);
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error loading finance data:', error);
+//             tbody.innerHTML = '<tr><td colspan="7" class="error">Error loading finance data</td></tr>';
+//         });
+// }
 function loadFinanceData() {
     const tbody = document.getElementById('financeBody');
     tbody.innerHTML = '<tr><td colspan="7" class="loading">Loading finance data...</td></tr>';

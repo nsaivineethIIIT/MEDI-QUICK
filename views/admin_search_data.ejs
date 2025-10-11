@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Search Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <!-- <link rel="stylesheet" href="/css/admin_dashboard.css"> -->
+    <style>
+        :root {
+            --blue: #0188df;
+            --black: #444d53;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: var(--black);
+        }
+
+        header {
+            background: var(--white);
+            padding: 1rem 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--black);
+        }
+
+        .navbar ul {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        .navbar ul li {
+            margin: 0 1rem;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: var(--black);
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .navbar ul li a:hover {
+            color: var(--blue);
+        }
+
+        .fa-bars {
+            font-size: 1.5rem;
+            color: var(--black);
+            cursor: pointer;
+            display: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 50px;
+            padding: 0 20px;
+        }
+
+        .heading {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--blue);
+            margin-bottom: 2rem;
+        }
+
+        .search-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--blue);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--blue);
+            padding-bottom: 0.5rem;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-form select,
+        .search-form input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-form select:focus,
+        .search-form input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .search-btn {
+            background: var(--blue);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #016bb5;
+        }
+
+        .table-container {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: var(--blue);
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 20px;
+            color: #e74c3c;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--blue), #016bb5);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .summary-card p {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+    .footer {
+    background: var(--black);
+    padding: 1rem 0;
+    text-align: center;
+    
+}
+
+.footer .box {
+    width: 100%;
+    margin: 0.5rem 0;
+    text-align: center;
+}
+
+.footer .box .logo {
+    padding: 0.5rem 0;
+    font-size: 1.8rem;
+    color: var(--white);
+}
+
+.footer .box .logo span {
+    color: var(--blue);
+}
+
+.footer .box p {
+    font-size: 1rem;
+    color: var(--white);
+    margin: 0.5rem 0;
+    line-height: 1.4;
+}
+
+.footer .box a {
+    color: var(--white);
+    font-size: 1rem;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    margin: 0 0.3rem;
+}
+
+.footer .box a:hover {
+    text-decoration: underline;
+}
+
+.footer .credit {
+    width: 100%;
+    padding-top: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--white);
+    text-align: center;
+    border-top: 0.1rem solid var(--white);
+    margin-top: 0.5rem;
+}
+
+.footer .credit span {
+    color: var(--blue);
+    text-decoration: underline;
+    letter-spacing: 0.1rem;
+}
+
+/* Date range search form styling */
+.search-form.date-range-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-form.date-range-form .search-btn {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 200px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .footer .box .logo {
+        font-size: 1.5rem;
+    }
+    
+    .footer .box p {
+        font-size: 0.9rem;
+    }
+    
+    .footer .box a {
+        font-size: 0.9rem;
+    }
+    
+    .footer .credit {
+        font-size: 0.8rem;
+    }
+}
+
+        @media (max-width: 768px) {
+            .navbar ul {
+                display: none;
+            }
+
+            .fa-bars {
+                display: block;
+            }
+
+            .navbar.nav-toggle ul {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo"><span>M</span>edi<span>Q</span>uick</a>
+        <nav class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/search-data">Search Data</a></li>
+                <li><a href="/admin/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
+                            alt="Profile Image" height="30px" width="30px"></a></li>
+            </ul>
+        </nav>
+        <div class="fas fa-bars"></div>
+    </header>
+
+    <div class="container">
+        <h1 class="heading">Search Data</h1>
+
+        <!-- Doctor Earnings Search Section -->
+        <section class="search-section">
+            <h2 class="section-title">Search Doctor Earnings</h2>
+            <div class="search-form">
+                <select id="doctorSelect">
+                    <option value="">Select a Doctor</option>
+                </select>
+                <button class="search-btn" onclick="searchDoctorEarnings()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div id="doctorSummary" class="summary-card" style="display: none;">
+                <h3>Total Earnings</h3>
+                <p id="totalDoctorEarnings">$0.00</p>
+            </div>
+
+            <div class="table-container">
+                <table id="doctorEarningsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Appointments Count</th>
+                            <th>Total Fees</th>
+                            <th>MediQuick Revenue (10%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctorEarningsBody">
+                        <tr>
+                            <td colspan="4" class="loading">Select a doctor to view earnings</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Specialization Earnings Search Section -->
+        <section class="search-section">
+            <h2 class="section-title">Search Specialization Earnings</h2>
+            <div class="search-form">
+                <select id="specializationSelect">
+                    <option value="">Select a Specialization</option>
+                </select>
+                <button class="search-btn" onclick="searchSpecializationEarnings()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <div id="specializationSummary" class="summary-card" style="display: none;">
+                <h3>Total Earnings</h3>
+                <p id="totalSpecializationEarnings">$0.00</p>
+            </div>
+
+            <div class="table-container">
+                <table id="specializationEarningsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Appointments Count</th>
+                            <th>Total Fees</th>
+                            <th>MediQuick Revenue (10%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="specializationEarningsBody">
+                        <tr>
+                            <td colspan="4" class="loading">Select a specialization to view earnings</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+                <!-- Date Range Search Section -->
+        <section class="search-section">
+            <h2 class="section-title">Search Appointments by Date Range</h2>
+            <div class="search-form date-range-form">
+                <input type="date" id="startDate" placeholder="Start Date">
+                <input type="date" id="endDate" placeholder="End Date">
+                <button class="search-btn" onclick="searchByDateRange()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+
+            <div id="dateRangeSummary" class="summary-card" style="display: none;">
+                <h3>Total Earnings for Selected Period</h3>
+                <p id="totalDateRangeEarnings">$0.00</p>
+                <p style="font-size: 1rem; margin-top: 5px;">MediQuick Revenue: <span id="totalDateRangeRevenue">$0.00</span></p>
+            </div>
+
+            <div class="table-container">
+                <table id="dateRangeTable">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Specialization</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Fee</th>
+                            <th>MediQuick Revenue (10%)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dateRangeBody">
+                        <tr>
+                            <td colspan="8" class="loading">Select date range to view appointments</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5"><strong>Total</strong></td>
+                            <td id="dateRangeTotalFees">$0.00</td>
+                            <td id="dateRangeTotalRevenue">$0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <%- include('partials/footer') %> 
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        let doctors = [];
+        let specializations = [];
+
+        // Load doctors and specializations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDoctors();
+            loadSpecializations();
+        });
+
+        // Load available doctors
+        async function loadDoctors() {
+            try {
+                const response = await fetch('/admin/api/appointments');
+                const appointments = await response.json();
+                
+                // Extract unique doctors
+                const doctorMap = new Map();
+                appointments.forEach(appt => {
+                    if (appt.doctorId && appt.doctorName) {
+                        if (!doctorMap.has(appt.doctorId)) {
+                            doctorMap.set(appt.doctorId, {
+                                id: appt.doctorId,
+                                name: appt.doctorName,
+                                specialization: appt.specialization || 'General Physician'
+                            });
+                        }
+                    }
+                });
+
+                doctors = Array.from(doctorMap.values());
+                const select = document.getElementById('doctorSelect');
+                
+                doctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.id;
+                    option.textContent = `${doctor.name} - ${doctor.specialization}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+            }
+        }
+
+        // Load available specializations
+        async function loadSpecializations() {
+            try {
+                const response = await fetch('/admin/api/appointments');
+                const appointments = await response.json();
+                
+                // Extract unique specializations
+                const specSet = new Set();
+                appointments.forEach(appt => {
+                    const spec = appt.specialization || 'General Physician';
+                    specSet.add(spec);
+                });
+
+                specializations = Array.from(specSet).sort();
+                const select = document.getElementById('specializationSelect');
+                
+                specializations.forEach(spec => {
+                    const option = document.createElement('option');
+                    option.value = spec;
+                    option.textContent = spec;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading specializations:', error);
+            }
+        }
+
+        // Search doctor earnings
+        async function searchDoctorEarnings() {
+            const doctorId = document.getElementById('doctorSelect').value;
+            if (!doctorId) {
+                alert('Please select a doctor');
+                return;
+            }
+
+            const tbody = document.getElementById('doctorEarningsBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading doctor earnings...</td></tr>';
+
+            try {
+                const response = await fetch('/admin/api/appointments');
+                const appointments = await response.json();
+
+                // Filter appointments for selected doctor
+                const doctorAppointments = appointments.filter(appt => 
+                    appt.doctorId === doctorId
+                );
+
+                // Group by date
+                const earningsByDate = {};
+                let totalFees = 0;
+                let totalRevenue = 0;
+
+                doctorAppointments.forEach(appt => {
+                    const date = appt.date;
+                    if (!earningsByDate[date]) {
+                        earningsByDate[date] = {
+                            date: date,
+                            count: 0,
+                            totalFees: 0,
+                            totalRevenue: 0
+                        };
+                    }
+                    
+                    earningsByDate[date].count++;
+                    earningsByDate[date].totalFees += appt.fee || 0;
+                    earningsByDate[date].totalRevenue += appt.revenue || 0;
+                    
+                    totalFees += appt.fee || 0;
+                    totalRevenue += appt.revenue || 0;
+                });
+
+                // Convert to array and sort by date (newest first)
+                const earningsArray = Object.values(earningsByDate).sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+
+                // Update table
+                tbody.innerHTML = '';
+                if (earningsArray.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty">No earnings data found for this doctor</td></tr>';
+                } else {
+                    earningsArray.forEach(day => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${day.date}</td>
+                            <td>${day.count}</td>
+                            <td>$${day.totalFees.toFixed(2)}</td>
+                            <td>$${day.totalRevenue.toFixed(2)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // Update summary
+                document.getElementById('totalDoctorEarnings').textContent = `$${totalFees.toFixed(2)}`;
+                document.getElementById('doctorSummary').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error searching doctor earnings:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="error">Error loading doctor earnings</td></tr>';
+            }
+        }
+
+        // Search specialization earnings
+        async function searchSpecializationEarnings() {
+            const specialization = document.getElementById('specializationSelect').value;
+            if (!specialization) {
+                alert('Please select a specialization');
+                return;
+            }
+
+            const tbody = document.getElementById('specializationEarningsBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading specialization earnings...</td></tr>';
+
+            try {
+                const response = await fetch('/admin/api/appointments');
+                const appointments = await response.json();
+
+                // Filter appointments for selected specialization
+                const specAppointments = appointments.filter(appt => 
+                    (appt.specialization || 'General Physician') === specialization
+                );
+
+                // Group by date
+                const earningsByDate = {};
+                let totalFees = 0;
+                let totalRevenue = 0;
+
+                specAppointments.forEach(appt => {
+                    const date = appt.date;
+                    if (!earningsByDate[date]) {
+                        earningsByDate[date] = {
+                            date: date,
+                            count: 0,
+                            totalFees: 0,
+                            totalRevenue: 0
+                        };
+                    }
+                    
+                    earningsByDate[date].count++;
+                    earningsByDate[date].totalFees += appt.fee || 0;
+                    earningsByDate[date].totalRevenue += appt.revenue || 0;
+                    
+                    totalFees += appt.fee || 0;
+                    totalRevenue += appt.revenue || 0;
+                });
+
+                // Convert to array and sort by date (newest first)
+                const earningsArray = Object.values(earningsByDate).sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+
+                // Update table
+                tbody.innerHTML = '';
+                if (earningsArray.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty">No earnings data found for this specialization</td></tr>';
+                } else {
+                    earningsArray.forEach(day => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${day.date}</td>
+                            <td>${day.count}</td>
+                            <td>$${day.totalFees.toFixed(2)}</td>
+                            <td>$${day.totalRevenue.toFixed(2)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                // Update summary
+                document.getElementById('totalSpecializationEarnings').textContent = `$${totalFees.toFixed(2)}`;
+                document.getElementById('specializationSummary').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error searching specialization earnings:', error);
+                tbody.innerHTML = '<tr><td colspan="4" class="error">Error loading specialization earnings</td></tr>';
+            }
+        }
+
+        async function searchByDateRange() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start date and end date');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('Start date cannot be after end date');
+                return;
+            }
+
+            const tbody = document.getElementById('dateRangeBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="loading">Loading appointments...</td></tr>';
+
+            try {
+                const response = await fetch('/admin/api/appointments');
+                const appointments = await response.json();
+
+                // Filter appointments by date range
+                const filteredAppointments = appointments.filter(appt => {
+                    const appointmentDate = new Date(appt.date);
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    return appointmentDate >= start && appointmentDate <= end;
+                });
+
+                // Update table
+                tbody.innerHTML = '';
+                if (filteredAppointments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="empty">No appointments found in this date range</td></tr>';
+                } else {
+                    let totalFees = 0;
+                    let totalRevenue = 0;
+
+                    filteredAppointments.forEach(appt => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${appt.patientName}</td>
+                            <td>${appt.doctorName}</td>
+                            <td>${appt.specialization}</td>
+                            <td>${appt.date}</td>
+                            <td>${appt.time}</td>
+                            <td>$${appt.fee.toFixed(2)}</td>
+                            <td>$${appt.revenue.toFixed(2)}</td>
+                            <td><span class="status ${appt.status}">${appt.status}</span></td>
+                        `;
+                        tbody.appendChild(row);
+
+                        totalFees += appt.fee || 0;
+                        totalRevenue += appt.revenue || 0;
+                    });
+
+                    // Update totals
+                    document.getElementById('dateRangeTotalFees').textContent = `$${totalFees.toFixed(2)}`;
+                    document.getElementById('dateRangeTotalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+                    
+                    // Update summary
+                    document.getElementById('totalDateRangeEarnings').textContent = `$${totalFees.toFixed(2)}`;
+                    document.getElementById('totalDateRangeRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+                    document.getElementById('dateRangeSummary').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('Error searching by date range:', error);
+                tbody.innerHTML = '<tr><td colspan="8" class="error">Error loading appointments</td></tr>';
+            }
+        }
+
+        // Mobile menu toggle
+        $(document).ready(function () {
+            $('.fa-bars').click(function () {
+                $(this).toggleClass('fa-times');
+                $('.navbar').toggleClass('nav-toggle');
+            });
+            
+            $(window).on('scroll load', function () {
+                $('.fa-bars').removeClass('fa-times');
+                $('.navbar').removeClass('nav-toggle');
+                if ($(window).scrollTop() > 30) {
+                    $('header').addClass('header-active');
+                } else {
+                    $('header').removeClass('header-active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
