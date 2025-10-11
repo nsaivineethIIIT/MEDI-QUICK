@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | Consult Doctors, Book Appointments, Order Medicine</title>
+    <!-- font awesome cdn link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- custom css file link -->
+    <link rel="stylesheet" href="/css/home_page.css">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <section id="home" class="home">
+            <div class="row">
+                <div class="images">
+                    <img src="https://static.vecteezy.com/system/resources/previews/013/758/401/non_2x/online-medicine-patient-call-doctor-via-internet-free-vector.jpg"
+                        alt="Telemedicine Consultation">
+                </div>
+                <div class="content">
+                    <h1><span>Instant</span> Care, <span> Anywhere</span>, Anytime.</h1>
+                    <p>Welcome to MediQuick, your trusted telemedicine platform for quick and reliable medical
+                        consultations. Connect with doctors, get prescriptions, and manage your health—all from the
+                        comfort
+                        of your home.</p>
+                    <a href="/about"><button class="button">Learn More</button></a>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="role" class="card">
+            <div class="container">
+                <h1 class="heading">Select your role</h1>
+                <div class="box-container">
+                    <div class="box">
+                        <img src="https://icons.veryicon.com/png/o/healthcate-medical/orange-particle/doctor-20.png"
+                            alt="Profile Icon">
+                        <div class="content">
+                            <h2 style="color:var(--blue)">Doctor</h2>
+                            <a href="/doctor/form"><button class="button"
+                                    style="margin-left:15.75%;">Select</button></a>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <img src="https://icons.veryicon.com/png/o/healthcate-medical/two-color-icon-of-simple-medical-project/patient-4.png"
+                            alt="Profile Icon">
+                        <div class="content">
+                            <h2 style="color:var(--blue)">Patient</h2>
+                            <a href="/patient/form"><button class="button"
+                                    style="margin-left:15.75%;">Select</button></a>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <img src="https://icons.veryicon.com/png/o/commerce-shopping/wangdianbao-icon-monochrome/administrators-6.png"
+                            alt="Profile Icon">
+                        <div class="content">
+                            <h2 style="color:var(--blue)">Admin</h2>
+                            <a href="/admin/form"><button class="button" style="margin-left:15.75%;">Select</button></a>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <img src="https://icons.veryicon.com/png/o/business/erp-system-background-icon/employee-turnover.png"
+                            alt="Profile Icon">
+                        <div class="content">
+                            <h2 style="color:var(--blue)">Employee</h2>
+                            <a href="/employee/form"><button class="button"
+                                    style="margin-left:15.75%;">Select</button></a>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <img src="https://icons.veryicon.com/png/o/miscellaneous/small-icons-1/supplier-15.png"
+                            alt="Profile Icon">
+                        <div class="content">
+                            <h2 style="color:var(--blue)">Supplier</h2>
+                            <a href="/supplier/form"><button class="button"
+                                    style="margin-left:15.75%;">Select</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="review" class="review">
+            <h1 class="heading">Our Patient Review</h1>
+            <h3 class="title">What Patient says about us</h3>
+            <div class="box-container">
+                <% const reviews=[ { name: "Vineeth" , date: "26-02-2025" }, { name: "Pavan" , date: "26-02-2025" }, {
+                    name: "Narendar" , date: "26-02-2025" }, { name: "Srimanth" , date: "26-02-2025" } ]; %>
+
+                    <% reviews.forEach(review=> { %>
+                        <div class="box">
+                            <i class="fas fa-quote-left"></i>
+                            <p>The convenience and efficiency of this service are outstanding! Scheduling an appointment
+                                was quick, and the consultation was seamless. The doctors were professional, attentive,
+                                and provided clear guidance. It's reassuring to have access to quality healthcare from
+                                the comfort of home. Highly recommended!</p>
+                            <div class="images">
+                                <img src="https://www.oneeducation.org.uk/wp-content/uploads/2020/06/cool-profile-icons-69.png"
+                                    alt="Reviewer Profile Icon">
+                                <div class="info">
+                                    <h3>
+                                        <%= review.name %>
+                                    </h3>
+                                    <span>Date: <%= review.date %></span>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+            </div>
+        </section>
+        
+        <div class="faq-header">
+            <h1 class="heading">How can we help you?</h1><br>
+            <p>We are here to answer all your <span class="faq-link">Frequently Asked Questions</span></p><br>
+        </div>
+
+        <div class="faq-container">
+            <div class="faq-tabs">
+                <button class="tab active" data-category="online">Online Consultation</button>
+                <button class="tab" data-category="pharmacy">Pharmacy</button>
+            </div>
+
+            <div class="faq-content">
+                <div class="faq-section" data-category="online">
+                    <div class="faq">
+                        <button class="faq-question">What is an online doctor consultation or online medical
+                            consultation?
+                            <span class="arrow">&#9660;</span></button>
+                        <div class="faq-answer">
+                            <p>An online consultation allows you to connect with a doctor via video or chat for medical
+                                advice.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq">
+                        <button class="faq-question">How do I consult a doctor online now? <span
+                                class="arrow">&#9660;</span></button>
+                        <div class="faq-answer">
+                            <p>You can book an online consultation via the MediQuick website or app by selecting a
+                                doctor
+                                and time slot.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq">
+                        <button class="faq-question">Do you provide online doctor consultation for emergencies? <span
+                                class="arrow">&#9660;</span></button>
+                        <div class="faq-answer">
+                            <p>Online consultations are not for emergencies. Please visit a hospital or call an
+                                ambulance
+                                for urgent care.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-section" data-category="pharmacy" style="display: none;">
+                    <div class="faq">
+                        <button class="faq-question">When will I receive my order? <span
+                                class="arrow">&#9660;</span></button>
+                        <div class="faq-answer">
+                            <p>For any update on your order such as delivery date and time, you can get in touch with
+                                our
+                                customer service email us at mediquick2025@gmail.com with your order details.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br><br>
+
+        <%- include('partials/footer') %>
+
+            <!-- jquery cd link -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const tabs = document.querySelectorAll(".tab");
+                    const sections = document.querySelectorAll(".faq-section");
+
+                    tabs.forEach(tab => {
+                        tab.addEventListener("click", function () {
+                            // Remove active class from all tabs
+                            tabs.forEach(t => t.classList.remove("active"));
+                            this.classList.add("active");
+
+                            // Hide all sections
+                            sections.forEach(section => section.style.display = "none");
+
+                            // Show the selected section
+                            const category = this.getAttribute("data-category");
+                            document.querySelector(`.faq-section[data-category="${category}"]`).style.display = "block";
+                        });
+                    });
+
+                    // FAQ Toggle
+                    document.querySelectorAll('.faq-question').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const answer = button.nextElementSibling;
+                            answer.classList.toggle('active');
+
+                            const arrow = button.querySelector('.arrow');
+                            arrow.classList.toggle('rotate');
+                        });
+                    });
+                });
+
+                $(document).ready(function () {
+                    $('.fa-bars').click(function () {
+                        $(this).toggleClass('fa-times');
+                        $('.navbar').toggleClass('nav-toggle');
+                    });
+                    $(Window).on('scroll load', function () {
+                        $(this).removeClass('fa-times');
+                        $('.navbar').removeClass('nav-toggle');
+                        if ($(Window).scrollTop() > 30) {
+                            $('header').addClass('header-active');
+                        } else {
+                            $('header').removeClass('header-active');
+                        }
+                    })
+                });
+            </script>
+</body>
+
+</html>
