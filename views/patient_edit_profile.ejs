@@ -6,6 +6,7 @@
     <title>MediQuick | Patient Edit Profile</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <style>
         /* Add your CSS styles here */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
@@ -309,9 +310,17 @@
         <div class="close-btn" onclick="closeProfile()">
             <i class="fas fa-times"></i>
         </div>
-        <form class="profile-form" id="editProfileForm">
+    <form class="profile-form" id="editProfileForm" enctype="multipart/form-data" method="POST" action="/patient/update-profile">
             <div id="errorMsg"></div>
       <div id="successMsg"></div>
+            <div style="text-align:center; margin: 1rem 0;">
+                <img id="avatarPreview" src="<%= patient.avatar || 'https://static.thenounproject.com/png/638636-200.png' %>" alt="Avatar" height="80" width="80" style="border-radius:50%; object-fit:cover;" />
+            </div>
+            <input type="file" id="avatar" name="avatar" accept="image/*" />
+            <div style="text-align:center; margin-bottom:1rem;">
+                <button id="removeAvatarBtn" type="button" class="button" style="width:auto;padding:.5rem 1rem;margin:0;">Remove Photo</button>
+                <input type="hidden" name="removeAvatar" id="removeAvatarInput" value="false" />
+            </div>
             <input type="text" id="name" name="name" placeholder="Full Name" value="<%= patient.name %>" required>
             <input type="email" id="email" name="email" placeholder="Email" value="<%= patient.email %>" pattern="[^\s@]+@[^\s@]+\.[^\s@]+" required>
             <input type="text" id="mobile" name="mobile" placeholder="Mobile" value="<%= patient.mobile %>" pattern="\d{10}" required>
@@ -324,6 +333,7 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- <script>
         $(document).ready(function () {
             $('.fa-bars').click(function () {
@@ -400,10 +410,26 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert(result.message);
-                    window.location.href = result.redirect || '/patient_profile';
+                    // Update avatar and name in header and on page without full reload
+                    if (result.avatar) {
+                        const headerImg = document.getElementById('headerAvatarImg');
+                        if (headerImg) headerImg.src = result.avatar;
+                        // also update dashboard img if present
+                        const dashImg = document.querySelector('img[src*="/patient/"]');
+                        // update preview on this page
+                        if (avatarPreview) avatarPreview.src = result.avatar;
+                    }
+                    if (result.name) {
+                        const headerName = document.getElementById('headerUserName');
+                        if (headerName) headerName.textContent = result.name;
+                    }
+                    showSuccess(result.message || 'Profile updated');
+                    // clear remove flag
+                    if (removeAvatarInput) removeAvatarInput.value = 'false';
+                    // clear cropped blob
+                    window.__croppedAvatarBlob = null;
                 } else {
-                    alert(result.error || 'Error updating profile');
+                    showError(result.error || 'Error updating profile');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -520,18 +546,21 @@
             }
             
             try {
-                // Create FormData object from the form
+                // Create FormData object from the form (supports file)
                 const formData = new FormData(this);
-                
-                // Convert FormData to URL-encoded string
-                const urlEncodedData = new URLSearchParams(formData).toString();
-                
+                // If a cropped blob is available, use it as the avatar file
+                if (window.__croppedAvatarBlob) {
+                    formData.delete('avatar');
+                    formData.append('avatar', window.__croppedAvatarBlob, 'avatar.jpg');
+                    formData.set('removeAvatar', 'false');
+                }
+                // ensure remove flag is included
+                const removeFlag = document.getElementById('removeAvatarInput') && document.getElementById('removeAvatarInput').value;
+                if (removeFlag) formData.set('removeAvatar', removeFlag);
+
                 const response = await fetch('/patient/update-profile', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: urlEncodedData
+                    body: formData
                 });
                 
                 const result = await response.json();
@@ -551,6 +580,91 @@
 
     function closeProfile() {
         window.location.href = "/patient/profile";
+    }
+
+    // Avatar preview and cropping using Cropper.js
+    let croppedBlob = null;
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatarPreview');
+    function openCropperModal(imageDataUrl) {
+        const modal = document.createElement('div');
+        modal.style = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000;';
+        modal.innerHTML = `
+            <div style="background:#fff;padding:1rem;border-radius:.5rem;max-width:90%;max-height:90%;display:flex;flex-direction:column;">
+                <div style="flex:1;overflow:auto;">
+                    <img id="cropperImage" src="${imageDataUrl}" style="max-width:100%;display:block;margin:0 auto;" />
+                </div>
+                <div style="text-align:center;margin-top:.5rem;">
+                    <button id="cropperCancel" class="button" type="button">Cancel</button>
+                    <button id="cropperApply" class="button" type="button">Crop & Use</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+        const img = document.getElementById('cropperImage');
+        const cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 1 });
+        document.getElementById('cropperCancel').addEventListener('click', function () {
+            cropper.destroy();
+            modal.remove();
+        });
+        document.getElementById('cropperApply').addEventListener('click', function () {
+            cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob(function (blob) {
+                croppedBlob = blob;
+                window.__croppedAvatarBlob = blob;
+                const url = URL.createObjectURL(blob);
+                if (avatarPreview) avatarPreview.src = url;
+                cropper.destroy();
+                modal.remove();
+            }, 'image/jpeg');
+        });
+    }
+
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function () {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                openCropperModal(ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    // store cropped blob globally for submission
+    window.__croppedAvatarBlob = null;
+    // override openCropperModal's resulting blob to global var
+    const realOpen = openCropperModal;
+    openCropperModal = function (imageDataUrl) {
+        realOpen(imageDataUrl);
+        // patch the apply handler to set global var when cropping
+        // (the modal implementation above already sets a local croppedBlob; we instead rely on the modal's behavior)
+    };
+    const removeAvatarBtn = document.getElementById('removeAvatarBtn');
+    const removeAvatarInput = document.getElementById('removeAvatarInput');
+    if (removeAvatarBtn && removeAvatarInput) {
+        removeAvatarBtn.addEventListener('click', async function () {
+            if (!confirm('Are you sure you want to remove your profile photo?')) return;
+            try {
+                const resp = await fetch('/patient/avatar/remove', { method: 'POST' });
+                const data = await resp.json();
+                if (resp.ok) {
+                    // update UI
+                    window.__croppedAvatarBlob = null;
+                    if (avatarPreview) avatarPreview.src = data.avatar;
+                    if (avatarInput) avatarInput.value = '';
+                    if (removeAvatarInput) removeAvatarInput.value = 'false';
+                    const headerImg = document.getElementById('headerAvatarImg');
+                    const headerName = document.getElementById('headerUserName');
+                    if (headerImg) headerImg.src = data.avatar;
+                    if (headerName && data.name) headerName.textContent = data.name;
+                    showSuccess('Profile photo removed successfully');
+                } else {
+                    showError(data.error || 'Failed to remove photo');
+                }
+            } catch (err) {
+                console.error('Remove avatar failed', err);
+                showError('Failed to remove photo');
+            }
+        });
     }
 </script>
 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title || 'Edit Doctor Profile' %> - MediQuick</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
@@ -326,10 +327,18 @@
     <div class="container">
         <h2>Edit Doctor Profile</h2>
         <% if (doctor) { %>
-            <form id="editProfileForm" action="/doctor/update-profile" method="POST">
+            <form id="editProfileForm" action="/doctor/update-profile" method="POST" enctype="multipart/form-data">
                 <div id="errorMsg"></div>
       <div id="successMsg"></div>
                 <div class="form-group">
+                    <div style="text-align:center; margin: 1rem 0;">
+                        <img id="avatarPreview" src="<%= doctor.avatar || 'https://static.thenounproject.com/png/638636-200.png' %>" alt="Avatar" height="80" width="80" style="border-radius:50%; object-fit:cover;" />
+                    </div>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" />
+                    <div style="text-align:center; margin-bottom:1rem;">
+                        <button id="removeAvatarBtn" type="button" class="button" style="width:auto;padding:.5rem 1rem;margin:0;">Remove Photo</button>
+                        <input type="hidden" name="removeAvatar" id="removeAvatarInput" value="false" />
+                    </div>
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" value="<%= doctor.name || '' %>" required>
                     <div class="error-message" id="name-error"></div>
@@ -393,6 +402,7 @@
     <%- include('partials/footer') %>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- <script>
         $(document).ready(function () {
             $('.fa-bars').click(function () {
@@ -640,8 +650,17 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }   
         
-        // Get form data
-        const formData = new FormData(this);
+            // Get form data
+            const formData = new FormData(this);
+            // if cropped blob exists, replace avatar entry
+            if (window.__croppedAvatarBlob) {
+                formData.delete('avatar');
+                formData.append('avatar', window.__croppedAvatarBlob, 'avatar.jpg');
+                formData.set('removeAvatar', 'false');
+            }
+            // include remove flag
+            const removeFlag = document.getElementById('removeAvatarInput') && document.getElementById('removeAvatarInput').value;
+            if (removeFlag) formData.set('removeAvatar', removeFlag);
         
         // Show loading state
         const submitBtn = this.querySelector('button[type="submit"]');
@@ -653,10 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Send the request using fetch
             const response = await fetch('/doctor/update-profile', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams(formData).toString()
+                body: formData
             });
             
             const data = await response.json();
@@ -683,6 +699,80 @@ document.addEventListener('DOMContentLoaded', function () {
             submitBtn.textContent = originalText;
         }
     });
+    // Avatar cropping using Cropper.js
+    window.__croppedAvatarBlob = null;
+    const avatarInput = document.getElementById('avatar');
+    const avatarPreview = document.getElementById('avatarPreview');
+    function openCropperModal(imageDataUrl) {
+        const modal = document.createElement('div');
+        modal.style = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:2000;';
+        modal.innerHTML = `
+            <div style="background:#fff;padding:1rem;border-radius:.5rem;max-width:90%;max-height:90%;display:flex;flex-direction:column;">
+                <div style="flex:1;overflow:auto;">
+                    <img id="cropperImage" src="${imageDataUrl}" style="max-width:100%;display:block;margin:0 auto;" />
+                </div>
+                <div style="text-align:center;margin-top:.5rem;">
+                    <button id="cropperCancel" class="button" type="button">Cancel</button>
+                    <button id="cropperApply" class="button" type="button">Crop & Use</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+        const img = document.getElementById('cropperImage');
+        const cropper = new Cropper(img, { aspectRatio: 1, viewMode: 1, autoCropArea: 1 });
+        document.getElementById('cropperCancel').addEventListener('click', function () {
+            cropper.destroy();
+            modal.remove();
+        });
+        document.getElementById('cropperApply').addEventListener('click', function () {
+            cropper.getCroppedCanvas({ width: 300, height: 300 }).toBlob(function (blob) {
+                window.__croppedAvatarBlob = blob;
+                const url = URL.createObjectURL(blob);
+                if (avatarPreview) avatarPreview.src = url;
+                cropper.destroy();
+                modal.remove();
+            }, 'image/jpeg');
+        });
+    }
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function (e) {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                openCropperModal(ev.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    // remove button behavior
+    window.__croppedAvatarBlob = null;
+    const removeAvatarBtn = document.getElementById('removeAvatarBtn');
+    const removeAvatarInput = document.getElementById('removeAvatarInput');
+    if (removeAvatarBtn && removeAvatarInput) {
+        removeAvatarBtn.addEventListener('click', async function () {
+            if (!confirm('Are you sure you want to remove your profile photo?')) return;
+            try {
+                const resp = await fetch('/doctor/avatar/remove', { method: 'POST' });
+                const data = await resp.json();
+                if (resp.ok) {
+                    window.__croppedAvatarBlob = null;
+                    if (avatarPreview) avatarPreview.src = data.avatar;
+                    if (avatarInput) avatarInput.value = '';
+                    if (removeAvatarInput) removeAvatarInput.value = 'false';
+                    const headerImg = document.getElementById('headerAvatarImg');
+                    const headerName = document.getElementById('headerUserName');
+                    if (headerImg) headerImg.src = data.avatar;
+                    if (headerName && data.name) headerName.textContent = data.name;
+                    showSuccess('Profile photo removed successfully');
+                } else {
+                    showError(data.error || 'Failed to remove photo');
+                }
+            } catch (err) {
+                console.error('Remove avatar failed', err);
+                showError('Failed to remove photo');
+            }
+        });
+    }
 });
 </script>
     

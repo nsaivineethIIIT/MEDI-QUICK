@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuick | About Us</title>
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="/css/about_us.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+        :root {
+            --blue: #0188df;
+            --black: #444d53;
+            --white: #fff;
+        }
+
+        * {
+            font-family: "Roboto", sans-serif;
+            margin: 0;
+            padding: 0;
+            text-decoration: none;
+            outline: none;
+            box-sizing: border-box;
+            transition: all linear .2s;
+        }
+
+        html {
+            font-size: 62.5%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .button {
+            height: 3.5rem;
+            width: 15rem;
+            background: var(--black);
+            color: var(--white);
+            font-size: 1.7rem;
+            text-transform: capitalize;
+            border-radius: .5rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            border: .1rem solid var(--blue);
+        }
+
+        .button:hover {
+            border: .1rem solid var(--blue);
+            background: var(--white);
+            color: var(--blue);
+            letter-spacing: .2rem;
+        }
+
+        .heading {
+            text-align: center;
+            font-size: 4rem;
+            padding: 1rem;
+            padding-top: 1rem;
+            color: var(--blue);
+            letter-spacing: .1rem;
+        }
+
+        .title {
+            text-align: center;
+            padding: 0rem 1rem;
+            font-size: 2.5rem;
+            color: var(--black);
+            font-weight: 300;
+        }
+
+        header {
+            width: 96%;
+            background: var(--white);
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translate(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            z-index: 1000;
+        }
+
+        header a {
+            color: var(--black);
+        }
+
+        header a:hover {
+            color: var(--blue);
+        }
+
+        header .logo {
+            font-size: 3rem;
+        }
+
+        header .logo span {
+            color: var(--blue);
+        }
+
+        header .navbar ul {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            list-style: none;
+        }
+
+        header .navbar ul li {
+            margin: 0 1rem;
+        }
+
+        header .navbar ul li a {
+            font-size: 2rem;
+            color: var(--black);
+        }
+
+        header .navbar ul li a:hover {
+            color: var(--blue);
+        }
+
+        header .fa-bars {
+            font-size: 3rem;
+            color: var(--blue);
+            cursor: pointer;
+            display: none;
+        }
+
+        header .fa-times {
+            transform: rotate(180deg);
+        }
+
+        .header-active {
+            top: 0;
+            width: 100%;
+            box-shadow: .1rem .3rem rgba(0, 0, 0, .3);
+        }
+
+        .footer {
+            background: var(--black);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+        }
+
+        .footer .box {
+            width: 30rem;
+            margin: 2rem;
+            text-align: center;
+        }
+
+        .footer .box:nth-child() {
+            text-align: left;
+        }
+
+        .footer .box .logo {
+            padding: 2rem 0;
+            font-size: 3rem;
+            color: var(--white);
+        }
+
+        .footer .box .logo:hover {
+            color: var(--blue);
+        }
+
+        .footer .box .logo span {
+            color: var(--blue);
+        }
+
+        .footer .box p {
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .footer .box a {
+            color: var(--white);
+            font-size: 2rem;
+            display: block;
+            padding: .2rem 0;
+        }
+
+        .footer .box a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .credit {
+            width: 85%;
+            padding-top: 1rem;
+            font-size: 2rem;
+            color: var(--white);
+            text-align: center;
+            border-top: .2rem solid var(--white);
+        }
+
+        .footer .credit span {
+            color: var(--blue);
+            text-decoration: underline;
+            letter-spacing: .5rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: var(--black);
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            margin-bottom: 1.5em;
+            font-size: 1.5rem;
+            color: var(--black);
+        }
+
+        ul {
+            margin-bottom: 1.5em;
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        li {
+            margin-bottom: 0.8em;
+            font-size: 1.5rem;
+            color: var(--black);
+        }
+
+        .content-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .services,
+        .why-choose-us,
+        .testimonials {
+            margin-top: 40px;
+        }
+
+        .services h2,
+        .why-choose-us h2,
+        .testimonials h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .service-item,
+        .reason-item {
+            background: var(--white);
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonials {
+            position: relative;
+        }
+
+        .testimonial-slider {
+            position: relative;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .testimonial-item {
+            display: none;
+            text-align: center;
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .testimonial-item.active {
+            display: block;
+        }
+
+        .testimonial-item p {
+            font-style: italic;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .testimonial-item strong {
+            display: block;
+            margin-top: 10px;
+            font-size: 20px;
+            color: var(--blue);
+        }
+
+        .prev,
+        .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: var(--blue);
+            font-weight: bold;
+            font-size: 24px;
+            transition: 0.3s;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background-color: var(--black);
+        }
+
+        @media (max-width:768px) {
+            html {
+                font-size: 55%;
+            }
+
+            header .fa-bars {
+                display: block;
+            }
+
+            header .navbar {
+                position: fixed;
+                top: -100rem;
+                left: 0;
+                width: 100%;
+                background: var(--white);
+                opacity: 0;
+            }
+
+            header .navbar ul {
+                flex-flow: column;
+                padding: 2rem 0;
+            }
+
+            header .navbar ul li {
+                margin: 1rem 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            header .navbar ul li a {
+                font-size: 2rem;
+                display: block;
+            }
+
+            header .nav-toggle {
+                top: 5.5rem;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/header') %>
+
+        <div class="container">
+            <h1 class="heading">About us</h1>
+            <div class="content">
+                <h2 style="color:var(--blue); font-size: 2rem;">Discover Mediquick</h2>
+                <p>Mediquick is a leading telemedicine platform dedicated to providing accessible healthcare remotely.
+                    Our
+                    mission is to connect patients with healthcare professionals conveniently.</p>
+                <p>With Mediquick, we strive to enhance the telehealth experience through advanced technology. Our team,
+                    including designers Vineeth, Pavan, Harish, Srimanth, and Narendar, prioritizes user-friendly
+                    interfaces
+                    and privacy, ensuring your health data is secure.</p>
+            </div>
+
+            <div class="content services">
+                <h2 style="color:var(--blue); font-size: 2rem;">Our Services</h2>
+                <div class="service-item">
+                    <h3>99% Confirmed Consultations</h3>
+                    <p>We provide high-quality virtual consultations with certified healthcare professionals from the
+                        comfort of your home.</p>
+                </div>
+                <div class="service-item">
+                    <h3>24/7 Accessibility</h3>
+                    <p>Mediquick ensures access to medical services around the clock, catering to all your telemedicine
+                        needs anytime.</p>
+                </div>
+            </div>
+
+            <div class="content why-choose-us">
+                <h2 style="color:var(--blue); font-size: 2rem;">Why Mediquick</h2>
+                <div class="reason-item">
+                    <h3>Accessibility</h3>
+                    <p>Mediquick offers 24/7 access to healthcare services, ensuring you get the care you need anytime,
+                        anywhere.</p>
+                </div>
+            </div>
+
+            <div class="content testimonials">
+                <h2 style="color:var(--blue); font-size: 2rem;">What Our Clients Say</h2>
+                <div class="testimonial-slider">
+                    <% const testimonials=[ {
+                        text: "Mediquick's telemedicine platform has completely transformed my practice. It's efficient, user-friendly, and my patients love the convenience."
+                        , name: "Dr. Smith" , title: "Primary Care Physician" }, {
+                        text: "The platform is incredibly intuitive and has significantly improved my patient interactions. Highly recommend it to any healthcare provider."
+                        , name: "Dr. Johnson" , title: "Cardiologist" }, {
+                        text: "Mediquick has made remote consultations seamless and effective. My patients appreciate the ease of use and reliability."
+                        , name: "Dr. Lee" , title: "Dermatologist" } ]; %>
+
+                        <% testimonials.forEach((testimonial, index)=> { %>
+                            <div class="testimonial-item <%= index === 0 ? 'active' : '' %>">
+                                <p>"<%= testimonial.text %>"</p>
+                                <p><strong>
+                                        <%= testimonial.name %>
+                                    </strong><br>
+                                    <%= testimonial.title %>
+                                </p>
+                            </div>
+                            <% }); %>
+
+                                <button class="prev" onclick="prevTestimonial()">&#10094;</button>
+                                <button class="next" onclick="nextTestimonial()">&#10095;</button>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <!-- jquery cd link -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+            <script>
+                $(document).ready(function () {
+                    $('.fa-bars').click(function () {
+                        $(this).toggleClass('fa-times');
+                        $('.navbar').toggleClass('nav-toggle');
+                    });
+                    $(window).on('scroll load', function () {
+                        $(this).removeClass('fa-times');
+                        $('.navbar').removeClass('nav-toggle');
+                        if ($(window).scrollTop() > 30) {
+                            $('header').addClass('header-active');
+                        } else {
+                            $('header').removeClass('header-active');
+                        }
+                    });
+                });
+
+                function closeProfile() {
+                    window.location.href = "/";
+                }
+
+                let currentTestimonial = 0;
+                const testimonials = document.querySelectorAll('.testimonial-item');
+
+                function showTestimonial(index) {
+                    testimonials.forEach((testimonial, i) => {
+                        testimonial.classList.remove('active');
+                        if (i === index) {
+                            testimonial.classList.add('active');
+                        }
+                    });
+                };
+
+                function nextTestimonial() {
+                    currentTestimonial = (currentTestimonial + 1) % testimonials.length;
+                    showTestimonial(currentTestimonial);
+                };
+
+                function prevTestimonial() {
+                    currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
+                    showTestimonial(currentTestimonial);
+                };
+
+                // Initialize the first testimonial
+                showTestimonial(currentTestimonial);
+            </script>
+</body>
+
+</html>

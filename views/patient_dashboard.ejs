@@ -23,9 +23,14 @@
                 <li><a href="/blog">Blog</a></li>
                 <li><a href="/contact">Contact Us</a></li>
                 <li><a href="/patient/prescriptions">My Prescriptions</a></li>
-                <li><a href="/patient/form">LogOut</a></li>
-                <li><a href="/patient/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
-                            alt="Profile Image" height="30px" width="30px"></a></li>
+                <li><a href="/logout">LogOut</a></li>
+                <li>
+                    <a href="/patient/profile">
+                        <img id="dashboardAvatarImg" src="<%= (patient && patient.avatar) ? patient.avatar : 'https://static.thenounproject.com/png/638636-200.png' %>"
+                            alt="Profile Image" height="30px" width="30px" style="border-radius:50%; object-fit:cover;">
+                    </a>
+                </li>
+                <!-- header buttons removed to restore original header layout -->
             </ul>
         </nav>
         <div class="fas fa-bars"></div>
@@ -130,6 +135,8 @@
         function closeProfile() {
             window.location.href = "/";
         }
+
+        // ...existing code...
     </script>
 </body>
 </html>

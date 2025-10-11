@@ -612,22 +612,7 @@
 </head>
 
 <body>
-    <header>
-        <a href="#" class="logo"><span>M</span>edi<span>Q</span>uick</a>
-        <nav class="navbar">
-            <ul>
-                <li><a href="#upcoming">Upcoming Appointments</a></li>
-                <li><a href="#previous">Previous Appointments</a></li>
-                <li><a href="/doctor/generate-prescriptions">Generate Prescriptions</a></li>
-                <li><a href="/doctor/prescriptions">See Prescriptions</a></li>
-                <li><a href="#slot">Slot Management</a></li>
-                <li><a href="#finance">Finance</a></li>
-                <li><a href="/doctor/profile"><img src="https://static.thenounproject.com/png/638636-200.png"
-                            alt="Profile Image" height="30px" width="30px"></a></li>
-            </ul>
-        </nav>
-        <div class="fas fa-bars"></div>
-    </header>
+    <%- include('partials/header') %>
 
     <section id="upcoming" class="about">
         <div class="close-btn" onclick="closeProfile()">

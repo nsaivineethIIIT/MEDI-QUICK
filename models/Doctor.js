@@ -29,6 +29,8 @@ const doctorSchema = new mongoose.Schema({
     securityCode: { type: String, required: true },
     password: { type: String, required: true },
     lastLogin: { type: Date }
+    ,
+    avatar: { type: String, default: 'https://static.thenounproject.com/png/638636-200.png' }
 }, { timestamps: true });
 
 const Doctor = mongoose.model('Doctor', doctorSchema);

@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const doctorController = require('../controllers/doctorController');
-const { upload } = require('../middlewares/upload');
-// modified doctor routes to complete implementation of appointment booking and cancellation
+const { upload, uploadBlog } = require('../middlewares/upload');
+
 router.get('/dashboard', doctorController.getDashboard); // Doctor dashboard
 router.get('/api/daily-earnings', doctorController.getDailyEarnings); // Get daily earnings
 router.get('/form', doctorController.getForm); // Get form
@@ -10,7 +10,9 @@ router.post('/signup', upload.single('document'), doctorController.signup); // D
 router.post('/login', doctorController.login); // Doctor login
 router.get('/profile', doctorController.getProfile); // Get doctor profile
 router.get('/edit-profile', doctorController.getEditProfile); // Get edit profile form
-router.post('/update-profile', doctorController.updateProfile); // Update doctor profile
+router.post('/update-profile', uploadBlog.single('avatar'), doctorController.updateProfile); // Update doctor profile (accept avatar)
+// Quick remove avatar
+router.post('/avatar/remove', doctorController.removeAvatar);
 router.get('/appointments',doctorController.getDoctorAppiontments);
 router.get('/appointments/previous',doctorController.getPreviousAppointments);
 router.get('/appointments/upcoming',doctorController.getUpcomingAppointments);
