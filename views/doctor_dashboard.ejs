@@ -630,22 +630,7 @@
         <div class="fas fa-bars"></div>
     </header>
 
-    <section id="upcoming" class="about">
-        <div class="close-btn" onclick="closeProfile()">
-            <i class="fas fa-times"></i>
-        </div>
-        <h1 class="heading">Upcoming Appointments</h1><br>
-        <div class="box-container" id="upcoming-appointments">
-            <!-- Appointments will be loaded here -->
-        </div>
-    </section>
-
-    <section id="previous" class="about">
-        <h1 class="heading">Previous Appointments</h1><br>
-        <div class="box-container" id="previous-appointments">
-            <!-- Appointments will be loaded here -->
-        </div>
-    </section>
+    
 
     <section class="about" id="slot">
         <h1 class="heading">Slot Management</h1><br>
@@ -715,65 +700,14 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
-                // Load appointments when page loads
-                loadAppointments();
-
-                // Initialize slot management
-                initSlotManagement();
+                
+               
 
                 // Load finance data
                 loadFinanceData();
             });
 
-            async function loadAppointments() {
-                try {
-                    // Load all appointments in one request
-                    const response = await fetch('/doctor/appointments');
-                    const { upcoming, previous } = await response.json();
-
-                    renderAppointments(upcoming, 'upcoming-appointments');
-                    renderAppointments(previous, 'previous-appointments');
-
-                } catch (error) {
-                    console.error('Error loading appointments:', error);
-                    alert('Failed to load appointments. Please refresh the page.');
-                }
-            }
-
-            function renderAppointments(appointments, containerId) {
-                const container = document.getElementById(containerId);
-                container.innerHTML = '';
-
-                if (appointments.length === 0) {
-                    container.innerHTML = '<p>No appointments found</p>';
-                    return;
-                }
-
-                appointments.forEach(appt => {
-                    const box = document.createElement('div');
-                    box.className = 'box';
-
-                    const patientName = appt.patientId?.name || 'Unknown Patient';
-                    const apptDate = new Date(appt.date).toLocaleDateString();
-                    const status = appt.status.charAt(0).toUpperCase() + appt.status.slice(1);
-
-                    box.innerHTML = `
-                    <h3>${patientName}</h3>
-                    <p><strong>Date:</strong> ${apptDate}</p>
-                    <p><strong>Time:</strong> ${appt.time}</p>
-                    <p><strong>Status:</strong> ${status}</p>
-                    <div class="action-buttons">
-                        ${appt.status === 'pending' ?
-                            `<button onclick="updateAppointment('${appt._id}', 'confirmed')">Confirm</button>
-                             <button onclick="updateAppointment('${appt._id}', 'cancelled')">Cancel</button>` : ''}
-                        ${appt.status === 'confirmed' ?
-                            `<button onclick="updateAppointment('${appt._id}', 'completed')">Mark Complete</button>
-                            <button onclick="openChat('${appt._id}')" class="chat-btn">Chat with Patient</button>` : ''}
-                    </div>
-                `;
-                    container.appendChild(box);
-                });
-            }
+           
 
             async function loadFinanceData() {
                 try {
@@ -829,177 +763,9 @@
                 }
             }
 
-            async function updateAppointment(appointmentId, status) {
-                try {
-                    const response = await fetch(`/appointment/${appointmentId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ status })
-                    });
+            
 
-                    const result = await response.json();
-                    console.log('Appointment update result:', result);
-
-                    if (response.ok) {
-                        alert(`Appointment ${status} successfully`);
-                        loadAppointments(); // Refresh the appointments list
-                        loadFinanceData(); // Refresh finance data
-                    } else {
-                        alert(result.error || 'Failed to update appointment');
-                    }
-                } catch (error) {
-                    console.error('Error updating appointment:', error);
-                    alert('Failed to update appointment. Please try again.');
-                }
-            }
-
-            function initSlotManagement() {
-                const dateContainer = document.getElementById("date-buttons");
-                const today = new Date();
-
-                // Generate date buttons for next 14 days
-                for (let i = 0; i < 14; i++) {
-                    let date = new Date();
-                    date.setDate(today.getDate() + i);
-                    let button = document.createElement("button");
-                    button.textContent = `${date.toLocaleString('en-US', { weekday: 'short' })} ${date.getDate()}`;
-                    button.value = date.toISOString().split("T")[0];
-                    button.addEventListener("click", function () {
-                        document.querySelectorAll(".date-selection button").forEach(btn => btn.classList.remove("selected"));
-                        this.classList.add("selected");
-                        updateSlots(date);
-                    });
-                    dateContainer.appendChild(button);
-                }
-
-                const allSlots = {
-                    morning: ["09:00 AM", "09:15 AM", "09:30 AM", "09:45 AM", "10:00 AM", "10:15 AM", "10:30 AM", "10:45 AM", "11:00 AM", "11:15 AM", "11:30 AM"],
-                    afternoon: ["02:00 PM", "02:15 PM", "02:30 PM", "02:45 PM", "03:00 PM", "03:15 PM", "03:30 PM", "03:45 PM"],
-                    evening: ["06:00 PM", "06:15 PM", "06:30 PM", "06:45 PM", "07:00 PM", "07:15 PM", "07:30 PM", "07:45 PM"]
-                };
-
-                async function updateSlots(selectedDate) {
-                    const now = new Date();
-                    const isToday = selectedDate.toDateString() === now.toDateString();
-                    const dateStr = selectedDate.toISOString().split("T")[0];
-
-                    try {
-                        // Get the doctor ID from the server-side rendered data
-                        const doctorId = '<%= doctor._id %>';
-
-                        // Fetch already booked slots for this doctor on this date
-                        const response = await fetch(`/appointment/api/booked-slots?doctorId=${doctorId}&date=${dateStr}`);
-                        const bookedSlots = await response.json();
-                        console.log('Booked slots:', bookedSlots);
-
-                        function filterSlots(slots) {
-                            return slots.filter(slot => {
-                                // Check if slot is booked
-                                if (bookedSlots.includes(slot)) {
-                                    console.log(`Slot ${slot} is already booked`);
-                                    return false;
-                                }
-
-                                // If today, check if slot is in past
-                                if (isToday) {
-                                    const [time, period] = slot.split(' ');
-                                    let [hours, minutes] = time.split(':').map(Number);
-
-                                    // Convert to 24-hour format
-                                    if (period === 'PM' && hours !== 12) hours += 12;
-                                    if (period === 'AM' && hours === 12) hours = 0;
-
-                                    const slotTime = new Date(selectedDate);
-                                    slotTime.setHours(hours, minutes, 0, 0);
-
-                                    return slotTime > now;
-                                }
-                                return true;
-                            });
-                        }
-
-                        function renderSlots(slots, containerId) {
-                            const container = document.getElementById(containerId);
-                            container.innerHTML = `<h3>${containerId.split('-')[0].toUpperCase()} SLOTS</h3>`;
-                            const filteredSlots = filterSlots(slots);
-
-                            if (filteredSlots.length > 0) {
-                                filteredSlots.forEach(slot => {
-                                    const button = document.createElement("button");
-                                    button.textContent = slot;
-                                    button.addEventListener("click", function () {
-                                        document.querySelectorAll(".slots button").forEach(btn => {
-                                            btn.classList.remove("selected");
-                                            btn.style.backgroundColor = '';
-                                        });
-                                        this.classList.add("selected");
-                                        this.style.backgroundColor = '#f0f0f0';
-                                    });
-                                    container.appendChild(button);
-                                });
-                            } else {
-                                container.innerHTML += `<p>No slots available</p>`;
-                            }
-                        }
-
-                        renderSlots(allSlots.morning, "morning-slots");
-                        renderSlots(allSlots.afternoon, "afternoon-slots");
-                        renderSlots(allSlots.evening, "evening-slots");
-                    } catch (error) {
-                        console.error("Error fetching booked slots:", error);
-                        // Fall back to showing all slots if API fails
-                        renderSlots(allSlots.morning, "morning-slots");
-                        renderSlots(allSlots.afternoon, "afternoon-slots");
-                        renderSlots(allSlots.evening, "evening-slots");
-                    }
-                }
-
-                document.getElementById('block-btn').addEventListener('click', async function () {
-                    const selectedDate = document.querySelector(".date-selection button.selected");
-                    const selectedTime = document.querySelector(".slots button.selected");
-
-                    if (selectedDate && selectedTime) {
-                        if (confirm(`Are you sure you want to block the slot on ${selectedDate.textContent} at ${selectedTime.textContent}?`)) {
-                            try {
-                                const response = await fetch('/appointment/api/block-slot', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        date: selectedDate.value,
-                                        time: selectedTime.textContent
-                                    })
-                                });
-
-                                const result = await response.json();
-
-                                if (response.ok) {
-                                    selectedTime.disabled = true;
-                                    selectedTime.style.backgroundColor = '#ffcccc';
-                                    selectedTime.textContent += ' (Blocked)';
-                                    alert('Slot blocked successfully');
-                                } else {
-                                    alert(result.error || 'Failed to block slot');
-                                }
-                            } catch (error) {
-                                console.error('Error blocking slot:', error);
-                                alert('Failed to block slot. Please try again.');
-                            }
-                        }
-                    } else {
-                        alert('Please select both a date and time slot');
-                    }
-                });
-
-                // Initialize slots for today
-                updateSlots(today);
-                if (dateContainer.firstChild) {
-                    dateContainer.firstChild.classList.add("selected");
-                }
-            }
+            
 
             $(document).ready(function () {
                 $('.fa-bars').click(function () {

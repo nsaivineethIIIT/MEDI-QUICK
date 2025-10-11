@@ -370,19 +370,7 @@
             <div class="loading">Loading doctor profile...</div>
         </div>
 
-        <div class="appointments">
-            <h3>Upcoming Appointments</h3>
-            <div id="upcoming-appointments">
-                <div class="loading">Loading upcoming appointments...</div>
-            </div>
-        </div>
-
-        <div class="appointments">
-            <h3>Previous Appointments</h3>
-            <div id="previous-appointments">
-                <div class="loading">Loading previous appointments...</div>
-            </div>
-        </div>
+        
 
         <div id="action-buttons" style="display: none;">
             <a href="/doctor/edit-profile" class="btn">Edit Profile</a>
@@ -435,7 +423,7 @@
             
             // Fetch doctor profile and appointments asynchronously
             fetchDoctorProfile();
-            fetchAppointments();
+         
         });
         
         // Function to fetch doctor profile from the server
@@ -524,76 +512,7 @@
         //         });
         // }
         // Function to fetch appointments from the server
-function fetchAppointments() {
-    // Fetch upcoming appointments
-    fetch('/doctor/appointments/upcoming')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch upcoming appointments');
-            }
-            return response.json();
-        })
-        .then(appointments => {
-            displayAppointments(appointments, 'upcoming-appointments');
-        })
-        .catch(error => {
-            console.error('Error fetching upcoming appointments:', error);
-            document.getElementById('upcoming-appointments').innerHTML = 
-                '<div class="error-message">Error loading upcoming appointments</div>';
-        });
-        
-    // Fetch previous appointments
-    fetch('/doctor/appointments/previous')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch previous appointments');
-            }
-            return response.json();
-        })
-        .then(appointments => {
-            displayAppointments(appointments, 'previous-appointments');
-        })
-        .catch(error => {
-            console.error('Error fetching previous appointments:', error);
-            document.getElementById('previous-appointments').innerHTML = 
-                '<div class="error-message">Error loading previous appointments</div>';
-        });
-}
-        
-        // Function to display appointments in the UI
-        function displayAppointments(appointments, containerId) {
-            const container = document.getElementById(containerId);
-            
-            if (!appointments || appointments.length === 0) {
-                container.innerHTML = '<p>No appointments found.</p>';
-                return;
-            }
-            
-            let html = '<ul>';
-            
-            appointments.forEach(appointment => {
-                const date = new Date(appointment.date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-                
-                html += `
-                    <li class="appointment-item">
-                        <div class="patient-name">${appointment.patientName || 'Unknown Patient'}</div>
-                        <div class="appointment-details">
-                            <span><strong>Date:</strong> ${date}</span>
-                            <span><strong>Time:</strong> ${appointment.time}</span>
-                            <span><strong>Type:</strong> ${appointment.type}</span>
-                            <span class="status-${appointment.status}"><strong>Status:</strong> ${appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}</span>
-                        </div>
-                    </li>
-                `;
-            });
-            
-            html += '</ul>';
-            container.innerHTML = html;
-        }
+
     </script>
 </body>
 </html>
