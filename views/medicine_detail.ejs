@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %> - MediQuick</title>
+    <style>
+      /* Your existing CSS styles from the medicine page */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      header {
+        background-color: #2c3e50;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+      }
+
+      .navbar ul {
+        list-style: none;
+        display: flex;
+      }
+
+      .navbar ul li {
+        margin: 0 15px;
+      }
+
+      .navbar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+      }
+
+      .medicine-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        gap: 20px;
+      }
+
+      .medicine-image {
+        flex: 1;
+        text-align: center;
+      }
+
+      .medicine-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+
+      .medicine-details {
+        flex: 1;
+      }
+
+      .medicine-details h1 {
+        font-size: 24px;
+        color: #2c3e50;
+      }
+
+      .medicine-details p {
+        font-size: 16px;
+        color: #333;
+        margin: 10px 0;
+      }
+
+      .medicine-details .price {
+        font-size: 20px;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+
+      .medicine-details .offer {
+        color: #27ae60;
+        font-weight: bold;
+      }
+
+      .medicine-details .delivery-info {
+        background: #ecf0f1;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+
+      .medicine-details .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .medicine-details .action-buttons select {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+
+      .medicine-details .add-to-cart,
+      .medicine-details .buy-now {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .medicine-details .buy-now {
+        background-color: #2980b9;
+      }
+
+      .medicine-details .add-to-cart:hover,
+      .medicine-details .buy-now:hover {
+        opacity: 0.9;
+      }
+
+      .footer {
+        background: #444d53;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 2rem 0;
+        color: white;
+      }
+
+      .footer .box {
+        width: 30rem;
+        margin: 2rem;
+        text-align: center;
+      }
+
+      .footer .box .logo {
+        padding: 2rem 0;
+        font-size: 3rem;
+        color: white;
+      }
+
+      .footer .box .logo span {
+        color: #0188df;
+      }
+
+      .footer .box p {
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      .footer .box a {
+        color: white;
+        font-size: 2rem;
+        display: block;
+        padding: 0.2rem 0;
+      }
+
+      .footer .box a:hover {
+        text-decoration: underline;
+      }
+
+      .footer .credit {
+        width: 85%;
+        padding-top: 1rem;
+        font-size: 2rem;
+        color: white;
+        text-align: center;
+        border-top: 0.2rem solid white;
+      }
+
+      .footer .credit span {
+        color: #0188df;
+        text-decoration: underline;
+        letter-spacing: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a href="#" class="logo"
+        ><span style="color: #0188df">M</span>edi<span style="color: #0188df"
+          >Q</span
+        >uick</a
+      >
+      <nav class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/faqs">FAQs</a></li>
+          <li><a href="/blogs">Blog</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/patient/form">LogOut</a></li>
+          <li><a href="/orders">Orders</a></li>
+          <li>
+            <a href="/patient/profile"
+              ><img
+                src="https://static.thenounproject.com/png/638636-200.png"
+                alt="Profile Image"
+                height="30px"
+                width="30px"
+            /></a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Medicine Details Section -->
+    <div class="medicine-container">
+      <!-- Left Column: Image and Description -->
+      <div class="medicine-image">
+        <img src="<%= medicine.imageUrl %>" alt="<%= medicine.name %>" />
+        <h1><%= medicine.name %></h1>
+        <p>
+          <strong>Manufacturer/Marketer:</strong>
+          <%= medicine.manufacturer %>
+        </p>
+        <p>
+          <strong>Consume Type:</strong>
+          <%= medicine.consumeType %>
+        </p>
+        <p>
+          <strong>Return Policy:</strong>
+          <%= medicine.returnPolicy %>
+        </p>
+        <p>
+          <strong>Expires on or after:</strong>
+          <%= medicine.formattedExpiryDate %>
+        </p>
+      </div>
+
+      <!-- Right Column: Cost, Quantity Selector, and Buttons -->
+      <div class="medicine-details">
+        <p class="price">
+          MRP: ₹<%= medicine.cost.toFixed(2) %>
+          <span class="offer">57% off</span>
+        </p>
+        <p>
+          ₹<%= (medicine.cost / 180).toFixed(2) %>/ml (Inclusive of all Taxes)
+        </p>
+
+        <div class="delivery-info">
+          <p>✔️ 239 people bought in last 7 days</p>
+          <p>Get FREE delivery on this order with circle membership</p>
+          <p>Enter delivery pincode</p>
+          <p>Provide Delivery Location</p>
+        </div>
+
+        <p>1 Bottle • 180 ml Shampoo</p>
+
+        <!-- Action Buttons and Quantity Dropdown -->
+        <div class="action-buttons">
+          <select id="quantity">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <button class="buy-now" data-id="<%= medicine._id %>">Buy Now</button>
+          <button class="add-to-cart" data-id="<%= medicine._id %>">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="box">
+        <h3 class="logo"><span>M</span>edi<span>Q</span>uick</h3>
+        <p>Your trusted healthcare partner</p>
+      </div>
+      <div class="box">
+        <h3>Quick Links</h3>
+        <a href="/">Home</a>
+        <a href="/about">About Us</a>
+        <a href="/faqs">FAQs</a>
+        <a href="/blogs">Blog</a>
+        <a href="/contact">Contact Us</a>
+      </div>
+      <div class="box">
+        <h3>Services</h3>
+        <a href="/patient/book-appointment">Book Appointment</a>
+        <a href="/patient/order-medicines">Order Medicines</a>
+        <a href="/patient/profile">Patient Profile</a>
+        <a href="/doctor/profile">Doctor Profile</a>
+      </div>
+      <div class="credit">
+        Created by <span>MediQuick Team</span> | All Rights Reserved
+      </div>
+    </div>
+  </body>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const quantityDropdown = document.getElementById("quantity");
+      const buyNowButton = document.querySelector(".buy-now");
+      const addToCartButton = document.querySelector(".add-to-cart");
+
+      buyNowButton.addEventListener("click", async function () {
+        const quantity = quantityDropdown.value;
+        const medicineId = this.getAttribute("data-id");
+
+        try {
+          const response = await fetch("/order/api/create", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              medicineId,
+              quantity: parseInt(quantity),
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showCustomMessage(
+              `Order created successfully! Order ID: ${data.order._id}`
+            );
+            // Optionally redirect to orders page
+            window.location.href = "/patient/dashboard";
+          } else {
+            showCustomMessage(
+              "Failed to create order: " + (data.error || "Unknown error")
+            );
+            if (data.available !== undefined) {
+              showCustomMessage(
+                `Only ${data.available} items available in stock`
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showCustomMessage("Failed to create order. Please try again.");
+        }
+      });
+
+      addToCartButton.addEventListener("click", async function () {
+        const quantity = quantityDropdown.value;
+        const medicineId = this.getAttribute("data-id");
+
+        try {
+          const response = await fetch("/api/add-to-cart", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              medicineId,
+              quantity,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            showCustomMessage(`${quantity} item(s) added to cart`);
+          } else {
+            if (data.available !== undefined) {
+              showCustomMessage(`Only ${data.available} available in stock`);
+            } else {
+              showCustomMessage(
+                "Failed to add to cart: " + (data.error || "Unknown error")
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showCustomMessage("Failed to add to cart. Please try again.");
+        }
+      });
+    });
+
+    // Simple custom message box function to replace alert()
+    function showCustomMessage(message) {
+      const messageBox = document.createElement("div");
+      messageBox.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        `;
+      messageBox.textContent = message;
+      document.body.appendChild(messageBox);
+      setTimeout(() => {
+        document.body.removeChild(messageBox);
+      }, 3000);
+    }
+  </script>
+</html>

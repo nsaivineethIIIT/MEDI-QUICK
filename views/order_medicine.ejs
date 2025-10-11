@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediQuick | Order Medicines</title>
+    <link rel="stylesheet" href="orderMedicines.css" />
+    <style>
+      /* Your existing CSS styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      header {
+        background-color: #2c3e50;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+      }
+
+      .navbar ul {
+        list-style: none;
+        display: flex;
+      }
+
+      .navbar ul li {
+        margin: 0 15px;
+      }
+
+      .navbar ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+      }
+
+      .search-section {
+        text-align: center;
+        padding: 30px;
+        background-color: #ecf0f1;
+      }
+
+      .search-section input {
+        width: 60%;
+        padding: 12px;
+        font-size: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .specializations {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        text-align: center;
+      }
+
+      .specialization-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+      }
+
+      .specialization-card:hover {
+        transform: scale(1.05);
+      }
+
+      @import url("https://icons.veryicon.com/png/o/healthcate-medical/orange-particle/doctor-20.pngs2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+      :root {
+        --blue: #0188df;
+        --black: #444d53;
+        --white: #fff;
+      }
+
+      * {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+        outline: none;
+        box-sizing: border-box;
+        transition: all linear 0.2s;
+      }
+
+      html {
+        font-size: 62.5%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      header {
+        width: 96%;
+        background: var(--white);
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        transform: translate(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 2rem;
+        z-index: 1000;
+      }
+
+      header a {
+        color: var(--black);
+      }
+
+      header a:hover {
+        color: var(--blue);
+      }
+
+      header .logo {
+        font-size: 3rem;
+      }
+
+      header .logo span {
+        color: var(--blue);
+      }
+
+      header .navbar ul {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        list-style: none;
+      }
+
+      header .navbar ul li {
+        margin: 0 1rem;
+      }
+
+      header .navbar ul li a {
+        font-size: 2rem;
+        color: var(--black);
+      }
+
+      header .navbar ul li a:hover {
+        color: var(--blue);
+      }
+
+      header .fa-bars {
+        font-size: 3rem;
+        color: var(--blue);
+        cursor: pointer;
+        display: none;
+      }
+
+      header .fa-times {
+        transform: rotate(180deg);
+      }
+
+      .header-active {
+        top: 0;
+        width: 100%;
+        box-shadow: 0.1rem 0.3rem rgba(0, 0, 0, 0.3);
+      }
+
+      .footer {
+        background: var(--black);
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        padding: 2rem 0;
+      }
+
+      .footer .box {
+        width: 30rem;
+        margin: 2rem;
+        text-align: center;
+      }
+
+      .footer .box:nth-child() {
+        text-align: left;
+      }
+
+      .footer .box .logo {
+        padding: 2rem 0;
+        font-size: 3rem;
+        color: var(--white);
+      }
+
+      .footer .box .logo:hover {
+        color: var(--blue);
+      }
+
+      .footer .box .logo span {
+        color: var(--blue);
+      }
+
+      .footer .box p {
+        font-size: 1.5rem;
+        color: var(--white);
+      }
+
+      .footer .box a {
+        color: var(--white);
+        font-size: 2rem;
+        display: block;
+        padding: 0.2rem 0;
+      }
+
+      .footer .box a:hover {
+        text-decoration: underline;
+      }
+
+      .footer .credit {
+        width: 85%;
+        padding-top: 1rem;
+        font-size: 2rem;
+        color: var(--white);
+        text-align: center;
+        border-top: 0.2rem solid var(--white);
+      }
+
+      .footer .credit span {
+        color: var(--blue);
+        text-decoration: underline;
+        letter-spacing: 0.5rem;
+      }
+
+      .search-doctor {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background-color: var(--black);
+        color: white;
+        margin-top: 100px;
+      }
+
+      .search-bar {
+        display: flex;
+        gap: 10px;
+      }
+
+      .search-bar input,
+      .filter-dropdown {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      .button {
+        padding: 10px 20px;
+        border: none;
+        background-color: var(--blue);
+        color: var(--white);
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .heading {
+        font-size: 2.5rem;
+        color: var(--blue);
+      }
+
+      .button:hover {
+        background-color: var(--blue);
+      }
+
+      .doctor-list {
+        padding: 20px;
+      }
+
+      .scroll-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        font-size: 1.5rem;
+      }
+
+      .doctor-card {
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+      }
+
+      .specialization-card img {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 10px;
+      }
+
+      .specialization-card p {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .banner {
+        background-color: #1b4f72;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin: 30px 0;
+        border-radius: 10px;
+      }
+
+      .banner h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .banner span {
+        text-decoration: line-through;
+        color: red;
+      }
+
+      .banner .cta {
+        background-color: #f39c12;
+        padding: 10px 20px;
+        color: white;
+        font-size: 18px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 10px;
+      }
+
+      .search-section {
+        text-align: center;
+        padding: 30px;
+        background-color: #ecf0f1;
+        margin-top: 70px;
+      }
+
+      .search-section input {
+        width: 60%;
+        padding: 12px;
+        font-size: 18px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .categories {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+      }
+
+      .filter-btn {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        background-color: #2980b9;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .medicine-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      .medicine-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+
+      .medicine-item:hover {
+        transform: translateY(-5px);
+      }
+
+      .medicine-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-bottom: 10px;
+      }
+
+      .medicine-item h3 {
+        margin: 10px 0;
+        font-size: 18px;
+        color: #333;
+      }
+
+      .medicine-details {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #666;
+      }
+
+      .medicine-item p.price {
+        font-size: 16px;
+        color: #27ae60;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+
+      .quantity-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 10px 0;
+      }
+
+      .quantity-controls button {
+        background-color: #f1f1f1;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .quantity-controls input {
+        width: 40px;
+        text-align: center;
+        margin: 0 5px;
+        padding: 5px;
+        border: 1px solid #ddd;
+      }
+
+      .add-to-cart {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .add-to-cart:hover {
+        background-color: #c0392b;
+      }
+
+      .book-now {
+        background-color: #0188df;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 5px;
+      }
+
+      .book-now:hover {
+        background-color: #0168b3;
+      }
+
+      .button-container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .doctor-card img {
+        width: 200px;
+        border-radius: 10px;
+        margin-right: 20px;
+      }
+
+      .title {
+        font-size: 2rem;
+        color: var(--blue);
+      }
+
+      @media (max-width: 768px) {
+        html {
+          font-size: 55%;
+        }
+
+        header .fa-bars {
+          display: block;
+        }
+
+        header .navbar {
+          position: fixed;
+          top: -100rem;
+          left: 0;
+          width: 100%;
+          background: var(--white);
+          opacity: 0;
+        }
+
+        header .navbar ul {
+          flex-flow: column;
+          padding: 2rem 0;
+        }
+
+        header .navbar ul li {
+          margin: 1rem 0;
+          width: 100%;
+          text-align: center;
+        }
+
+        header .navbar ul li a {
+          font-size: 2rem;
+          display: block;
+        }
+
+        header .nav-toggle {
+          top: 5.5rem;
+          opacity: 1;
+        }
+
+        .search-doctor {
+          flex-flow: column;
+        }
+
+        .search-doctor .search-bar {
+          flex-flow: column;
+        }
+
+        .medicine-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Loading spinner */
+      .loading-spinner {
+        display: none;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a href="#" class="logo"
+        ><span style="color: var(--blue)">M</span>edi<span
+          style="color: var(--blue)"
+          >Q</span
+        >uick</a
+      >
+      <nav class="navbar">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/faqs">FAQs</a></li>
+          <li><a href="/blogs">Blog</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+          <li><a href="/patient/form">LogOut</a></li>
+          <li><a href="/orders">Orders</a></li>
+          <li>
+            <a href="/patient/profile"
+              ><img
+                src="https://static.thenounproject.com/png/638636-200.png"
+                alt="Profile Image"
+                height="30px"
+                width="30px"
+            /></a>
+          </li>
+        </ul>
+      </nav>
+      <div class="fas fa-bars"></div>
+    </header>
+
+    <section class="search-section">
+      <h1>Order Medicines</h1>
+      <input type="text" id="search" placeholder="Search for medicines..." />
+    </section>
+
+    <div class="loading-spinner" id="loadingSpinner"></div>
+    <section class="medicine-list" id="medicineList">
+      <% medicines.forEach(medicine=> { %>
+      <div class="medicine-item">
+        <a href="/patient/medicines/<%= medicine._id %>" class="medicine-link">
+          <img
+            src="https://th.bing.com/th/id/OIP.1N_r8UyW1bIoHyb_YCmcaAHaHa?w=250&h=250&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
+            alt="<%= medicine.name %>"
+          />
+          <h3><%= medicine.name %></h3>
+        </a>
+        <div class="medicine-details">
+          <div>ID: <%= medicine.medicineID %></div>
+          <div>Manufacturer: <%= medicine.manufacturer %></div>
+          <% if (medicine.expiryDate) { %>
+          <div>
+            Expires: <%= new Date(medicine.expiryDate).toLocaleDateString() %>
+          </div>
+          <% } %>
+        </div>
+        <p class="price">$<%= medicine.cost.toFixed(2) %></p>
+        <div class="quantity-controls">
+          <button class="decrement">-</button>
+          <input
+            type="number"
+            class="quantity"
+            value="1"
+            min="1"
+            max="<%= medicine.quantity %>"
+          />
+          <button class="increment">+</button>
+        </div>
+        <div class="button-container">
+          <a href="/patient/medicines/<%= medicine._id %>">
+            <button class="book-now">View Details</button>
+          </a>
+          <!-- <button class="add-to-cart" data-id="<%= medicine._id %>">Add to Cart</button> -->
+        </div>
+      </div>
+      <% }); %>
+    </section>
+
+    <div class="footer">
+      <div class="box">
+        <h3 class="logo"><span>M</span>edi<span>Q</span>uick</h3>
+        <p>Your trusted healthcare partner</p>
+      </div>
+      <div class="box">
+        <h3>Quick Links</h3>
+        <a href="/">Home</a>
+        <a href="/about">About Us</a>
+        <a href="/faqs">FAQs</a>
+        <a href="/blogs">Blog</a>
+        <a href="/contact">Contact Us</a>
+      </div>
+      <div class="box">
+        <h3>Services</h3>
+        <a href="/patient/book-appointment">Book Appointment</a>
+        <a href="/patient/order-medicines">Order Medicines</a>
+        <a href="/patient/profile">Patient Profile</a>
+        <a href="/doctor/profile">Doctor Profile</a>
+      </div>
+      <div class="credit">
+        Created by <span>MediQuick Team</span> | All Rights Reserved
+      </div>
+    </div>
+  </body>
+
+  <!-- jquery cd link -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("search");
+      const medicineList = document.getElementById("medicineList");
+      const loadingSpinner = document.getElementById("loadingSpinner");
+
+      // Function to filter medicines based on search query
+      function filterMedicines(query) {
+        const lowerCaseQuery = query.toLowerCase();
+        const medicineItems = document.querySelectorAll(".medicine-item");
+
+        medicineItems.forEach((item) => {
+          const medicineName = item
+            .querySelector("h3")
+            .textContent.toLowerCase();
+          if (medicineName.includes(lowerCaseQuery)) {
+            item.style.display = "block";
+          } else {
+            item.style.display = "none";
+          }
+        });
+      }
+
+      // Event listener for search input
+      searchInput.addEventListener("input", function () {
+        filterMedicines(searchInput.value.trim());
+      });
+
+      // Quantity controls
+      medicineList.addEventListener("click", function (e) {
+        const target = e.target;
+        const quantityInput = target
+          .closest(".quantity-controls")
+          ?.querySelector(".quantity");
+
+        if (target.classList.contains("decrement") && quantityInput) {
+          if (quantityInput.value > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+          }
+        } else if (target.classList.contains("increment") && quantityInput) {
+          const max = parseInt(quantityInput.max);
+          if (quantityInput.value < max) {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+          } else {
+            showCustomMessage(`Only ${max} available in stock`);
+          }
+        }
+      });
+
+      // Add to cart functionality
+      medicineList.addEventListener("click", async function (e) {
+        if (e.target.classList.contains("add-to-cart")) {
+          const medicineId = e.target.getAttribute("data-id");
+          const quantity = parseInt(
+            e.target.closest(".medicine-item").querySelector(".quantity").value
+          );
+
+          try {
+            const response = await fetch("/api/add-to-cart", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                medicineId,
+                quantity,
+              }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              showCustomMessage(`${quantity} item(s) added to cart`);
+              // Refresh medicine list to reflect updated quantities
+              await searchMedicines(searchInput.value.trim());
+            } else {
+              if (data.available !== undefined) {
+                showCustomMessage(`Only ${data.available} available in stock`);
+              } else {
+                showCustomMessage(
+                  "Failed to add to cart: " + (data.error || "Unknown error")
+                );
+              }
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showCustomMessage("Failed to add to cart. Please try again.");
+          }
+        }
+      });
+
+      // Book now functionality
+      medicineList.addEventListener("click", function (e) {
+        if (e.target.classList.contains("book-now")) {
+          const medicineId = e.target.getAttribute("data-id");
+          const quantity = parseInt(
+            e.target.closest(".medicine-item").querySelector(".quantity").value
+          );
+
+          // Redirect to medicine detail page or handle booking
+          window.location.href = `/patient/medicines/${medicineId}`;
+        }
+      });
+
+      // Search API integration
+      async function searchMedicines(query) {
+        try {
+          loadingSpinner.style.display = "block";
+          medicineList.style.display = "none";
+
+          const response = await fetch(
+            `/api/medicines/search?query=${encodeURIComponent(query)}`
+          );
+          const medicines = await response.json();
+
+          if (response.ok) {
+            medicineList.innerHTML = "";
+            medicines.forEach((medicine) => {
+              const item = `
+                            <div class="medicine-item">
+                                <a href="/patient/medicines/${
+                                  medicine._id
+                                }" class="medicine-link">
+                                    <img src="https://th.bing.com/th/id/OIP.1N_r8UyW1bIoHyb_YCmcaAHaHa?w=250&h=250&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2" alt="${
+                                      medicine.name
+                                    }">
+                                    <h3>${medicine.name}</h3>
+                                </a>
+                                <div class="medicine-details">
+                                    <div>ID: ${medicine.medicineID}</div>
+                                    <div>Manufacturer: ${
+                                      medicine.manufacturer
+                                    }</div>
+                                </div>
+                                <p class="price">$${medicine.cost.toFixed(
+                                  2
+                                )}</p>
+                                <div class="quantity-controls">
+                                    <button class="decrement">-</button>
+                                    <input type="number" class="quantity" value="1" min="1" max="${
+                                      medicine.quantity
+                                    }">
+                                    <button class="increment">+</button>
+                                </div>
+                                <div class="button-container">
+                                    <a href="/patient/medicines/${
+                                      medicine._id
+                                    }"><button class="book-now">Book Now</button></a>
+                                    <button class="add-to-cart" data-id="${
+                                      medicine._id
+                                    }">Add to Cart</button>
+                                </div>
+                            </div>
+                        `;
+              medicineList.insertAdjacentHTML("beforeend", item);
+            });
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+        } finally {
+          loadingSpinner.style.display = "none";
+          medicineList.style.display = "grid";
+        }
+      }
+    });
+
+    $(document).ready(function () {
+      $(".fa-bars").click(function () {
+        $(this).toggleClass("fa-times");
+        $(".navbar").toggleClass("nav-toggle");
+      });
+      $(window).on("scroll load", function () {
+        $(".fa-bars").removeClass("fa-times");
+        $(".navbar").removeClass("nav-toggle");
+        if ($(window).scrollTop() > 30) {
+          $("header").addClass("header-active");
+        } else {
+          $("header").removeClass("header-active");
+        }
+      });
+    });
+
+    function showCustomMessage(message) {
+      const messageBox = document.createElement("div");
+      messageBox.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+        `;
+      messageBox.textContent = message;
+      document.body.appendChild(messageBox);
+      setTimeout(() => {
+        document.body.removeChild(messageBox);
+      }, 3000);
+    }
+  </script>
+</html>
