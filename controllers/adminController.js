@@ -202,7 +202,7 @@ exports.getProfileData = async (req, res) => {
             });
         }
 
-        // Add mock data for consultations (replace with actual data from your database)
+        
         const profileData = {
             success: true,
             admin: {
@@ -502,7 +502,7 @@ exports.getAppointments = async (req, res) => {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // Add date filtering if provided
+        
         const { startDate, endDate } = req.query;
         let query = {
             isBlockedSlot: { $ne: true },
@@ -533,7 +533,7 @@ exports.getAppointments = async (req, res) => {
                 date: dateStr,
                 time: appt.time,
                 fee: appt.consultationFee || 0,
-                revenue: (appt.consultationFee || 0) * 0.1, // 10% revenue
+                revenue: (appt.consultationFee || 0) * 0.1, 
                 status: appt.status
             };
         });
@@ -554,11 +554,11 @@ exports.getEarnings =  async (req, res) => {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // Define the start date (Jan 1, 2025)
+        
         const startDate = new Date('2025-01-01');
-        const endDate = new Date(); // Current date
+        const endDate = new Date(); 
 
-        // Fetch appointments within the date range
+        
         const appointments = await Appointment.find({
             isBlockedSlot: { $ne: true },
             status: { $ne: 'cancelled' },
@@ -567,10 +567,10 @@ exports.getEarnings =  async (req, res) => {
             .populate('doctorId', 'specialization')
             .lean();
 
-        // Aggregate daily earnings
+        
         const dailyEarnings = {};
         appointments.forEach(appt => {
-            const dateStr = appt.date.toISOString().split('T')[0]; // YYYY-MM-DD
+            const dateStr = appt.date.toISOString().split('T')[0]; 
             if (!dailyEarnings[dateStr]) {
                 dailyEarnings[dateStr] = {
                     date: dateStr,
@@ -584,7 +584,7 @@ exports.getEarnings =  async (req, res) => {
             dailyEarnings[dateStr].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Aggregate monthly earnings
+        
         const monthlyEarnings = {};
         appointments.forEach(appt => {
             const date = new Date(appt.date);
@@ -602,7 +602,7 @@ exports.getEarnings =  async (req, res) => {
             monthlyEarnings[monthKey].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Aggregate yearly earnings
+        
         const yearlyEarnings = {};
         appointments.forEach(appt => {
             const year = new Date(appt.date).getFullYear();
@@ -619,9 +619,9 @@ exports.getEarnings =  async (req, res) => {
             yearlyEarnings[year].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Convert to arrays and sort
+        
         const dailyEarningsArray = Object.values(dailyEarnings)
-            .sort((a, b) => new Date(b.date) - new Date(a.date)); // Newest first
+            .sort((a, b) => new Date(b.date) - new Date(a.date)); 
         const monthlyEarningsArray = Object.values(monthlyEarnings)
             .sort((a, b) => a.month.localeCompare(b.month));
         const yearlyEarningsArray = Object.values(yearlyEarnings)
@@ -647,7 +647,7 @@ exports.getSignins = async (req, res) => {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // Get all users from all collections with timestamps
+        
         const [patients, doctors, admins, suppliers, employees] = await Promise.all([
             Patient.find().select('name email createdAt').lean(),
             Doctor.find().select('name email createdAt').lean(),
@@ -656,7 +656,7 @@ exports.getSignins = async (req, res) => {
             Employee.find().select('name email createdAt').lean()
         ]);
 
-        // Combine all users and add type information
+        
         const allUsers = [
             ...patients.map(u => ({ ...u, type: 'Patient' })),
             ...doctors.map(u => ({ ...u, type: 'Doctor' })),
@@ -665,10 +665,10 @@ exports.getSignins = async (req, res) => {
             ...employees.map(u => ({ ...u, type: 'Employee' }))
         ];
 
-        // Sort by lastLogin date (newest first)
+        
         allUsers.sort((a, b) => new Date(b.lastLogin) - new Date(a.lastLogin));
 
-        // Format the data
+        
         const signins = allUsers.map(user => ({
             name: user.name,
             email: user.email,
@@ -684,14 +684,14 @@ exports.getSignins = async (req, res) => {
     }
 };
 
-// new api endpoints for finance
+
 exports.getFinanceData = async (req, res) => {
     try {
         if (!req.session.adminId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // Fetch all non-cancelled appointments for finance data
+        
         const appointments = await Appointment.find({
             isBlockedSlot: { $ne: true },
             status: { $ne: 'cancelled' }
@@ -709,7 +709,7 @@ exports.getFinanceData = async (req, res) => {
             date: appt.date.toISOString().split('T')[0],
             time: appt.time,
             fee: appt.consultationFee || 0,
-            revenue: (appt.consultationFee || 0) * 0.1, // 10% revenue
+            revenue: (appt.consultationFee || 0) * 0.1, 
             status: appt.status
         }));
 
@@ -729,22 +729,22 @@ exports.getEarnings = async (req, res) => {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        // Only filter by start date (Jan 1, 2025), no end date to include future appointments
+        
         const startDate = new Date('2025-01-01');
 
-        // Fetch appointments from start date onwards (including all future dates)
+       
         const appointments = await Appointment.find({
             isBlockedSlot: { $ne: true },
             status: { $ne: 'cancelled' },
-            date: { $gte: startDate } // No end date filter - includes all future appointments
+            date: { $gte: startDate } 
         })
         .populate('doctorId', 'specialization')
         .lean();
 
-        // Aggregate daily earnings
+        
         const dailyEarnings = {};
         appointments.forEach(appt => {
-            const dateStr = appt.date.toISOString().split('T')[0]; // YYYY-MM-DD
+            const dateStr = appt.date.toISOString().split('T')[0]; 
             if (!dailyEarnings[dateStr]) {
                 dailyEarnings[dateStr] = {
                     date: dateStr,
@@ -758,7 +758,7 @@ exports.getEarnings = async (req, res) => {
             dailyEarnings[dateStr].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Aggregate monthly earnings
+        
         const monthlyEarnings = {};
         appointments.forEach(appt => {
             const date = new Date(appt.date);
@@ -776,7 +776,7 @@ exports.getEarnings = async (req, res) => {
             monthlyEarnings[monthKey].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Aggregate yearly earnings
+        
         const yearlyEarnings = {};
         appointments.forEach(appt => {
             const year = new Date(appt.date).getFullYear();
@@ -793,7 +793,7 @@ exports.getEarnings = async (req, res) => {
             yearlyEarnings[year].totalRevenue += (appt.consultationFee || 0) * 0.1;
         });
 
-        // Convert to arrays and sort
+        
         const dailyEarningsArray = Object.values(dailyEarnings)
             .sort((a, b) => new Date(b.date) - new Date(a.date));
         const monthlyEarningsArray = Object.values(monthlyEarnings)
@@ -921,12 +921,12 @@ exports.getRevenueSummary = async (req, res) => {
         .populate('doctorId', 'specialization')
         .lean();
 
-        // Calculate totals
+        
         const totalAppointments = appointments.length;
         const totalFees = appointments.reduce((sum, appt) => sum + (appt.consultationFee || 0), 0);
         const totalRevenue = totalFees * 0.1;
 
-        // Calculate by specialization
+        
         const specializationData = {};
         appointments.forEach(appt => {
             const spec = appt.doctorId?.specialization || 'General Physician';
@@ -959,6 +959,25 @@ exports.getRevenueSummary = async (req, res) => {
         res.status(500).json({
             error: 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+};
+
+exports.getSearchData = async (req, res) => {
+    try {
+        if (!req.session.adminId) {
+            return res.redirect('/admin/form?error=login_required');
+        }
+
+        res.render('admin_search_data', {
+            title: 'Search Data'
+        });
+    } catch (err) {
+        console.error("Error rendering search data page:", err.message);
+        res.status(500).render('error', {
+            message: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+            redirect: '/admin/form'
         });
     }
 };
