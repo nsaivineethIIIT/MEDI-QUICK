@@ -141,6 +141,61 @@ exports.getDoctorRequestsCount = async (req, res) => {
 };
 
 
+// exports.getProfile = async (req, res) => {
+//     try {
+//         if (!req.session.employeeId) {
+//             return res.redirect('/employee/form?error=login_required');
+//         }
+
+//         if (!mongoose.Types.ObjectId.isValid(req.session.employeeId)) {
+//             return res.status(400).render('error', {
+//                 message: 'Invalid session data',
+//                 redirect: '/employee/form'
+//             });
+//         }
+
+//         const employee = await Employee.findById(req.session.employeeId).lean();
+
+//         if (!employee) {
+//             return res.status(404).render('error', {
+//                 message: 'Employee not found',
+//                 redirect: '/employee/form'
+//             });
+//         }
+
+//         employee.previousRegistrations = [
+//             {
+//                 doctorName: "Dr. Smith",
+//                 registrationDate: "15th Jan 2025",
+//                 status: "Approved"
+//             },
+//             {
+//                 doctorName: "Dr. Johnson",
+//                 registrationDate: "22nd Feb 2025",
+//                 status: "Rejected"
+//             }
+//         ];
+
+//         employee.pendingRegistrations = [
+//             {
+//                 doctorName: "Dr. Williams",
+//                 registrationDate: "5th Mar 2025"
+//             }
+//         ];
+
+//         res.render('employee_profile', {
+//             employee,
+//             title: 'Employee Profile'
+//         });
+//     } catch (err) {
+//         console.error("Error fetching employee profile:", err.message);
+//         res.status(500).render('error', {
+//             message: 'Internal server error',
+//             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+//             redirect: '/employee_form'
+//         });
+//     }
+// };
 exports.getProfile = async (req, res) => {
     try {
         if (!req.session.employeeId) {
@@ -154,45 +209,77 @@ exports.getProfile = async (req, res) => {
             });
         }
 
-        const employee = await Employee.findById(req.session.employeeId).lean();
-
-        if (!employee) {
-            return res.status(404).render('error', {
-                message: 'Employee not found',
-                redirect: '/employee/form'
-            });
-        }
-
-        employee.previousRegistrations = [
-            {
-                doctorName: "Dr. Smith",
-                registrationDate: "15th Jan 2025",
-                status: "Approved"
-            },
-            {
-                doctorName: "Dr. Johnson",
-                registrationDate: "22nd Feb 2025",
-                status: "Rejected"
-            }
-        ];
-
-        employee.pendingRegistrations = [
-            {
-                doctorName: "Dr. Williams",
-                registrationDate: "5th Mar 2025"
-            }
-        ];
-
+        // Just render the template without data - data will be fetched via API
         res.render('employee_profile', {
-            employee,
             title: 'Employee Profile'
         });
     } catch (err) {
-        console.error("Error fetching employee profile:", err.message);
+        console.error("Error rendering employee profile:", err.message);
         res.status(500).render('error', {
             message: 'Internal server error',
             details: process.env.NODE_ENV === 'development' ? err.message : undefined,
-            redirect: '/employee_form'
+            redirect: '/employee/form'
+        });
+    }
+};
+
+exports.getProfileData = async (req, res) => {
+    try {
+        if (!req.session.employeeId) {
+            return res.status(401).json({
+                error: 'Unauthorized',
+                message: 'Please log in first'
+            });
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(req.session.employeeId)) {
+            return res.status(400).json({ error: 'Invalid session data' });
+        }
+
+        const employee = await Employee.findById(req.session.employeeId).lean();
+
+        if (!employee) {
+            return res.status(404).json({
+                error: 'Not Found',
+                message: 'Employee not found'
+            });
+        }
+
+        // Add mock data for registrations (replace with actual data from your database)
+        const profileData = {
+            employee: {
+                name: employee.name,
+                email: employee.email,
+                mobile: employee.mobile,
+                address: employee.address
+            },
+            previousRegistrations: [
+                {
+                    doctorName: "Dr. Smith",
+                    registrationDate: "15th Jan 2025",
+                    status: "Approved"
+                },
+                {
+                    doctorName: "Dr. Johnson",
+                    registrationDate: "22nd Feb 2025",
+                    status: "Rejected"
+                }
+            ],
+            pendingRegistrations: [
+                {
+                    doctorName: "Dr. Williams",
+                    registrationDate: "5th Mar 2025"
+                }
+            ]
+        };
+
+        res.status(200).json(profileData);
+    } catch (err) {
+        console.error("Error fetching employee profile data:", err.message);
+        res.status(500).json({
+            error: 'Server Error',
+            message: 'Internal server error',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
 };
@@ -415,22 +502,4 @@ exports.postApproveDoctor = async (req, res) => {
             redirect: '/employee/dashboard'
         });
     }
-};
-
-exports.updateProfilePhoto = async (req, res) => {
-  try {
-    const employeeId = req.session.employeeId;
-    const employee = await Employee.findById(employeeId);
-    if (req.file) {
-      employee.profilePhoto = '/uploads/' + req.file.filename;
-      await employee.save();
-    }
-    res.redirect('/employee/profile');
-  } catch (err) {
-    res.status(500).send('Error updating profile photo');
-  }
-};
-
-exports.uploadPhoto = (req, res) => {
-    // Photo upload logic here
 };
