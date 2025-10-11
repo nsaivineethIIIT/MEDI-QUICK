@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const { DOCTOR_SECURITY_CODE } = require('../constants/constants');
 
 const {checkEmailExists, checkMobileExists} = require('../utils/utils');
-
+// modified doctor controller to allow appointment viewing and cancellation
 exports.signup = async (req, res) => {
     const {
         name, email, mobile, address, registrationNumber,
@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
     });
 
     try {
-        // Validate required fields
+        
         if (!name || !email || !mobile || !address || !registrationNumber ||
             !college || !yearOfPassing || !location || !onlineStatus || !securityCode || !password) {
             console.log('Validation failed: Missing required fields', {
