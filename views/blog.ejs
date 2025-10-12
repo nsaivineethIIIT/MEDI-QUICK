@@ -10,6 +10,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <link rel="stylesheet" href="/css/home_page.css">
     <style>
       :root {
         --primary-color: #0188df;
@@ -23,8 +24,10 @@
         --transition: all 0.3s ease-in-out;
         
       } 
+      
 
       body {
+        padding-top: 500px;
         background: linear-gradient(to bottom, var(--light-bg), #e8f5e9);
         font-family: 'Poppins', Arial, sans-serif;
         margin: 0;
@@ -33,10 +36,12 @@
       }
 
       main {
-        margin-top: 40px;
+        margin-top: 100px;
         min-height: calc(100vh - 40px);
         position: relative;
       }
+
+     
 
       /* Header Section */
       .blog-heading {
@@ -397,6 +402,7 @@
   </head>
      
   <body>
+    <%- include('partials/header') %>
     <main class="main">
       <div class="blog-heading">
         <div class="logo-content">
@@ -443,7 +449,7 @@
           </ul>
         </div>
         
-        <a href="/post" class="post-button">
+    <a href="/blog/post" class="post-button">
             Post Blog
         </a>
       </div>
@@ -519,6 +525,7 @@
         </div>
       </div>
     </main>
+    <%- include('partials/footer') %>
     <script src="Links/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
