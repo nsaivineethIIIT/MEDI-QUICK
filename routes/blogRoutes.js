@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const blogController = require('../controllers/blogController');
-const { uploadBlog } = require('../middlewares/upload');
+const blogController = require('../controllers/blogController.js');
+const { uploadBlog } = require('../middlewares/upload.js');
 
 router.get('/', blogController.getBlogs);
 router.get('/post', blogController.getPostForm);
