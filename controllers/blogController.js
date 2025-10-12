@@ -1,7 +1,7 @@
-const Blog = require('../models/Blog');
-const Patient = require('../models/Patient');
-const Doctor = require('../models/Doctor');
-const Employee = require('../models/Employee');
+const Blog = require('../models/Blog.js');
+const Patient = require('../models/Patient.js');
+const Doctor = require('../models/Doctor.js');
+const Employee = require('../models/Employee.js');
 
 exports.getBlogs = async (req, res) => {
     try {
@@ -41,7 +41,10 @@ exports.getPostForm = (req, res) => {
 
 exports.postSubmit = async (req, res) => {
     try {
-        const { title, theme, content, imageUrls } = req.body;
+
+    let { title, theme, content, imageUrls } = req.body;
+    // If theme is empty, set to 'Default'
+    if (!theme) theme = 'Default';
 
         // Initialize images array
         let images = [];
