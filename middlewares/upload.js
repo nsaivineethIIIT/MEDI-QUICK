@@ -14,7 +14,7 @@ const generalStorage = multer.diskStorage({
     }
 });
 
-const upload1 = multer({ storage: generalStorage });
+const upload = multer({ storage: generalStorage });
 
 // Blog image uploads to public/uploads
 // const blogStorage = multer.diskStorage({
@@ -67,19 +67,6 @@ const uploadBlog = multer({
     }
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dir = path.join(__dirname, '../public/uploads');
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload2 = multer({ storage });
-module.exports = upload2;
+module.exports = { upload, uploadBlog };
 
 
-module.exports = { upload1, uploadBlog };
